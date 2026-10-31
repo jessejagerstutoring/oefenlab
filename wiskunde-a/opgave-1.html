@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Opgave 1-trainer · Wiskunde A</title>
+<meta name="description" content="Oefen opgave 1 van het CCVX-tentamen Wiskunde A, stap voor stap.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@500;600;700;800&display=swap">
+<link rel="stylesheet" href="../assets/css/app.css">
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] },
+    svg: { fontCache: 'global', displayAlign: 'left', displayIndent: '0' },
+    startup: { typeset: false }
+  };
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.js"></script>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" id="h-home" href="../index.html" aria-label="Naar de startpagina van Oefenlab">
+      <span class="logo" aria-hidden="true">1</span>
+      <span class="brand-t"><b>Opgave 1-trainer</b><small>Wiskunde A · Oefenlab</small></span>
+    </a>
+    <button class="btn iconbtn ghost" id="h-close" aria-label="Terug naar het menu" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+    <div class="pbar" id="h-bar" hidden><i></i></div>
+    <span class="pmode" id="h-mode" hidden>Helemaal zelf</span>
+    <span class="pcount" id="h-count" hidden></span>
+    <div class="top-act">
+      <span class="streak" id="h-streak" hidden></span>
+      <button class="btn" id="b-plans" aria-label="Stappenplannen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 4h6a4 4 0 0 1 4 4v13a3 3 0 0 0-3-3H2z"/><path d="M22 4h-6a4 4 0 0 0-4 4v13a3 3 0 0 1 3-3h7z"/></svg><span class="lbl">Stappenplannen</span></button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap home" id="v-home"></main>
+<main class="wrap home" id="v-exams" hidden></main>
+
+<main class="wrap practice" id="v-practice" hidden>
+  <div class="pmain">
+    <div class="exstrip" id="exstrip" hidden></div>
+    <div class="qhead">
+      <span class="qpill" id="qpill"></span>
+      <p class="prompt" id="pq"></p>
+    </div>
+    <section class="stepcard" id="work" aria-live="polite"></section>
+    <div class="tools" id="tools"></div>
+    <div id="panel" hidden></div>
+  </div>
+  <aside class="side" aria-label="Jouw uitwerking">
+    <div class="sheet-card">
+      <div class="hd"><h3>Jouw uitwerking</h3><span id="side-sub">zo schrijf je het op</span></div>
+      <div id="sheet"></div>
+      <div class="statrow" aria-label="Je voortgang"><span><b id="st-n">0</b> gemaakt</span><span><b id="st-c">0</b> zonder hulp</span><span><b id="st-s">0</b> op rij</span></div>
+    </div>
+  </aside>
+</main>
+
+<div class="fbar" id="fbar" role="status" aria-live="polite">
+  <div class="fbar-in">
+    <div class="fbar-msg"><span class="fbar-ic" id="fbar-ic" aria-hidden="true"></span><div class="fbar-t"><b id="fbar-title"></b><span id="fbar-body"></span></div></div>
+    <div class="acts"><span class="kbd">Enter</span><button class="btn primary big" id="fbar-btn"></button></div>
+  </div>
+</div>
+
+<dialog id="plans" aria-labelledby="plans-h">
+  <div class="dlg-h"><h2 id="plans-h">Stappenplannen</h2>
+    <button class="btn iconbtn" id="b-close" aria-label="Sluiten"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>
+  <p class="dlg-intro">Bijna elke deelvraag van opgave 1 is een van deze soorten. Weet je welke soort het is, dan weet je ook welke route je neemt.</p>
+  <div class="plans">
+    <div class="plan"><h3>Veeltermvergelijking of snijpunten</h3><span class="cue">Herken je aan: alleen machten van x</span>
+      <ol><li>Snijpunten? Stel f(x) = g(x).</li><li>Zet alles links, zodat er rechts 0 staat.</li><li>Zit er in elke term een x? Haal de kleinste macht buiten haakjes en splits: x = 0 ∨ (…) = 0.</li><li>Los het kwadratische deel op met de abc-formule.</li><li>Coördinaten gevraagd? Reken y uit met de makkelijkste formule.</li></ol></div>
+    <div class="plan"><h3>Exponentieel of log</h3><span class="cue">Herken je aan: x in de exponent of in een log</span>
+      <ol><li>Werk toe naar één macht: g<sup>x</sup> = getal.</li><li>Twee grondtallen? Deel ze door elkaar: (p/q)<sup>x</sup>.</li><li>Alles een macht van hetzelfde getal? Stel de exponenten gelijk.</li><li>Anders: x = <sup>g</sup>log(getal) = log(getal) / log(g).</li><li>Log in de som? Zet de log alleen en gebruik log(a) = b ⇔ a = 10<sup>b</sup>.</li></ol></div>
+    <div class="plan"><h3>Wortelvergelijking</h3><span class="cue">Herken je aan: x onder een wortel</span>
+      <ol><li>Zorg dat de wortel alleen staat.</li><li>Kwadrateer beide kanten, met haakjes om de rechterkant.</li><li>Werk de haakjes uit en zet alles op 0.</li><li>Los op met de abc-formule.</li><li>Vul elke oplossing in de oorspronkelijke vergelijking in. Klopt hij echt?</li></ol></div>
+    <div class="plan"><h3>Afgeleide</h3><span class="cue">Herken je aan: helling, raaklijn, top of minimum</span>
+      <ol><li>Vertaal: helling = f′(x), horizontaal: f′(x) = 0, evenwijdig: f′(x) = rc, minimum: f′(x) = 0 en dan f(x).</li><li>Kies je regel: machts-, ketting-, product- of quotiëntregel.</li><li>Bepaal f′(x) en vereenvoudig.</li><li>Vul in, of los de vergelijking op. Gekwadrateerd? Controleer!</li><li>Coördinaten of waarde gevraagd? Reken met f, niet met f′.</li></ol></div>
+    <div class="plan"><h3>Formule omwerken</h3><span class="cue">Herken je aan: log(R) = … omzetten naar R = …</span>
+      <ol><li>Maak de log vrij die je kwijt wilt.</li><li>Schrijf losse getallen als log: q = log(10<sup>q</sup>).</li><li>Rekenregels: log a + log b = log(ab), p·log a = log(a<sup>p</sup>).</li><li>log(A) = log(B) dus A = B.</li></ol></div>
+    <div class="plan"><h3>Rijen en lijnen</h3><span class="cue">Herken je aan: een som van termen, of twee lijnen</span>
+      <ol><li>Rij: steeds +v (rekenkundig) of steeds ×r (meetkundig)?</li><li>Tel het aantal termen: (laatste − eerste)/v + 1.</li><li>Gebruik de somformule.</li><li>Lijnen: zelfde rc is evenwijdig; snijpunt: stel de vergelijkingen gelijk.</li></ol></div>
+  </div>
+  <p class="rules">Op het tentamen werk je algebraïsch: laat elke stap zien. Komt er een wortel of logaritme in je antwoord, geef dan ook een afgeronde waarde.</p>
+</dialog>
+
+<script src="../content/wiskunde-a/opgave-1.js"></script>
+<script src="../assets/js/progress.js"></script>
+<script src="../assets/js/trainer.js"></script>
+</body>
+</html>
