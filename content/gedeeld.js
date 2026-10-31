@@ -147,6 +147,14 @@ function vakTheorie() {
   });
   return T;
 }
+// Een getal als 37{,}5 is LaTeX en hoort binnen \( \). In gewone tekst (vraag, hint, uitleg) wordt het 37,5.
+const TEKSTVELDEN = new Set(['prompt', 'q', 'hint', 'why', 'before', 'after']);
+function zonderTexKomma(o, k) {
+  if (typeof o === 'string') return TEKSTVELDEN.has(k) ? o.replace(/(\\\([\s\S]*?\\\))|\{,\}/g, (m, wiskunde) => wiskunde || ',') : o;
+  if (Array.isArray(o)) return o.map(x => zonderTexKomma(x, k));
+  if (Object.prototype.toString.call(o) === '[object Object]') { for (const key of Object.keys(o)) o[key] = zonderTexKomma(o[key], key); }
+  return o;
+}
 function maakOnderdeel({ onderdeel, gens, home }) {
   const o = VAK.onderdelen.find(x => x.id === onderdeel);
   const topics = Object.entries(VAK.vaardigheden).filter(([id, v]) => v.onderdeel === onderdeel && Object.values(gens).some(g => g.topic === id))
@@ -172,6 +180,7 @@ function maakOnderdeel({ onderdeel, gens, home }) {
       p.params = prm; p.key = key; p.src = src || null; p.topic = G.topic;
       // contextopgaven: tijd, aantallen en hoeveelheden zijn niet negatief, dus de grafiek begint bij 0
       if (p.plot && !p.plot.domain) p.plot.domain = [0, Infinity];
+      ['prompt', 'steps', 'plot'].forEach(k => { if (p[k]) p[k] = zonderTexKomma(p[k], k); });
       return p;
     },
     checkAns,

@@ -9,8 +9,8 @@
  */
 
 const TYPES = {
-  veelterm: { h: 'Veeltermvergelijking', d: 'alleen machten van x, zoals x² of x³' },
-  expo: { h: 'Exponentiële of log-vergelijking', d: 'x staat in een exponent, zoals 5ˣ, of in een log' },
+  veelterm: { h: 'Tweede- of hogeregraadsvergelijking', d: 'alleen machten van x, zoals x² of x³' },
+  expo: { h: 'Exponentiële of logaritmische vergelijking', d: 'x staat in een exponent, zoals 5ˣ, of in een logaritme' },
   wortel: { h: 'Wortelvergelijking', d: 'x staat onder een wortelteken' },
   afgeleide: { h: 'Vraag met de afgeleide', d: 'het gaat over een helling, raaklijn, top of minimum' },
 };
@@ -264,7 +264,7 @@ function buildSnij({ f, g, ask, ftex, gtex, xas }) {
   return { type: 'veelterm', name: xas ? 'Snijpunten met de x-as' : 'Snijpunten van twee grafieken', pts: 5, prompt, steps, final };
 }
 
-/* ---------- 2. exponentiële en log-vergelijkingen ---------- */
+/* ---------- 2. exponentiële en logaritmische vergelijkingen ---------- */
 const EXPO_CUE = 'Klopt. De x staat in de exponent, het kleine getal rechtsboven. Dat is een exponentiële vergelijking.';
 function logMethodStep(g, R, s = 0) {
   const X = s ? `x${sgnNum(s)}` : 'x';
@@ -1216,7 +1216,7 @@ function makeProblem(key, params, src, lvl) {
 }
 
 
-const TYPE = { veelterm: 'Veeltermvergelijking', expo: 'Exponentieel of log', wortel: 'Wortelvergelijking', afgeleide: 'Afgeleide', lijnen: 'Rechte lijnen', formules: 'Formule omwerken', rijen: 'Rijen' };
+const TYPE = { veelterm: 'Tweede- of hogeregraadsvergelijking', expo: 'Exponentiële of logaritmische vergelijking', wortel: 'Wortelvergelijking', afgeleide: 'Differentiëren', lijnen: 'Lineaire functies', formules: 'Formule herleiden', rijen: 'Rijen' };
 
 /* ---------- "Hoe zat het ook alweer?" ---------- */
 const THEORY = {

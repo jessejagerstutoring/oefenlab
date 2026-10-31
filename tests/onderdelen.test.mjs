@@ -29,6 +29,9 @@ for (const f of files) {
       const bad = m => fails.push(`${key} niveau ${lvl}: ${m}\n      ${String(p.prompt).replace(/\s+/g, ' ').slice(0, 150)}`);
       if (!p.prompt || !p.steps || !p.steps.length) { bad('geen vraag of stappen'); continue; }
       if (/NaN|undefined|Infinity/.test(p.prompt + JSON.stringify(p.steps.map(s => [s.q, s.write, s.options && s.options.map(o => o.h + o.why), s.hint])))) bad('toont NaN of undefined');
+      // LaTeX zoals 37{,}5 of \frac mag alleen binnen \( \) staan, niet in gewone tekst
+      const tekst = [p.prompt, p.plot && p.plot.before, p.plot && p.plot.after, ...p.steps.flatMap(s => [s.q, s.hint, ...(s.options || []).map(o => o.why)])];
+      if (tekst.some(t => typeof t === 'string' && /\{,\}|\\cdot|\\frac|\\sqrt|\\text/.test(t.replace(/\\\([\s\S]*?\\\)/g, '')))) bad('LaTeX-code in gewone tekst');
       p.steps.forEach((s, j) => {
         if (s.kind === 'mc') {
           const ok = s.options.filter(o => o.ok).length;

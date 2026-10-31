@@ -58,13 +58,13 @@ h1, h2, h3 { font-family: var(--display); font-weight: 600; letter-spacing: -0.0
   box-shadow: inset 0 -4px 0 rgba(0, 0, 0, .18);
 }
 .brand-t { display: flex; flex-direction: column; line-height: 1.15; min-width: 0; }
-.brand-t b { font-family: var(--display); font-weight: 600; font-size: 19px; white-space: nowrap; }
+.brand-t b { font-family: var(--display); font-weight: 600; font-size: 19px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .brand-t small { font-size: 13px; color: var(--muted); font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .top-act { display: flex; align-items: center; gap: 8px; flex: none; }
 .streak { display: inline-flex; align-items: center; gap: 6px; padding: 7px 12px; border-radius: 999px; background: var(--amber-soft); color: var(--amber-ink); font-weight: 800; font-size: 14px; white-space: nowrap; }
 .streak svg { width: 17px; height: 17px; }
 .streak.bump { animation: bump .6s var(--spring); }
-@media (max-width: 560px) { .brand-t small { display: none; } .top .btn .lbl, .top .hide-sm { display: none; } }
+@media (max-width: 560px) { .brand-t small { display: none; } .top .btn .lbl, .top .hide-sm { display: none; } .top-act > a.btn { width: 44px; padding: 0; justify-content: center; } }
 
 /* ---------- knoppen ---------- */
 .btn {
@@ -440,6 +440,7 @@ dialog::backdrop { background: rgba(20, 22, 40, .35); }
 .dash-tile { padding: 12px 16px; border-radius: 16px; background: var(--soft); display: flex; flex-direction: column; min-width: 120px; }
 .dash-tile b { font-family: var(--display); font-weight: 700; font-size: 28px; line-height: 1.1; font-variant-numeric: tabular-nums; }
 .dash-tile span { font-size: 13px; color: var(--muted); font-weight: 700; }
+@media (max-width: 560px) { .dash-tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; } .dash-tile { min-width: 0; padding: 10px 12px; } .dash-tile b { font-size: 24px; } .dash-tile span { font-size: 12px; } }
 .dash-tools { display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: center; }
 .dash-legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 13px; font-weight: 700; color: var(--ink-2); }
 .dash-legend span { display: inline-flex; align-items: center; gap: 6px; }
@@ -747,4 +748,16 @@ dialog::backdrop { background: rgba(20, 22, 40, .35); }
   .ns-nav { display: none; }
   .ns-select { display: block; }
   .ns-ex { padding-left: 20px; padding-top: 56px; }
+}
+
+/* telefoon: onderwerpen als lijst, met het plaatje links en de naam rechts */
+@media (max-width: 560px) {
+  .topics { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+  .topic-go { display: grid; grid-template-columns: 104px minmax(0, 1fr); column-gap: 14px; row-gap: 6px; align-items: center; padding: 12px 60px 12px 12px; text-align: left; }
+  .topic .art { grid-row: 1 / span 2; height: 64px; }
+  .topic .art svg { width: 92px; height: 54px; }
+  .topic-go b { font-size: 16px; align-self: end; }
+  .topic .meta { align-self: start; min-height: 0; }
+  .topic-learn { top: 50%; right: 12px; transform: translateY(-50%); margin: 0; }
+  .topic-learn:hover { transform: translateY(-50%) scale(1.08); }
 }

@@ -618,7 +618,8 @@
   const niceStep = r => { const m = Math.pow(10, Math.floor(Math.log10(r))); return [1, 2, 5, 10].map(k => k * m).find(v => v >= r); };
   const fmtNum = v => String(Math.round(v * 1000) / 1000).replace('.', ',').replace('-', '−');
   function drawPlot(spec, done, animate) {
-    const W = 600, H = 340, ml = 40, mr = 14, mt = 18, mb = 28;
+    // op een telefoon een smaller assenstelsel, zodat de getallen langs de assen leesbaar blijven
+    const narrow = innerWidth < 560, W = narrow ? 360 : 600, H = narrow ? 250 : 340, ml = narrow ? 36 : 40, mr = 14, mt = 18, mb = 28;
     let lo = Math.min(...spec.keys), hi = Math.max(...spec.keys);
     const pad = Math.max(2, (hi - lo) * 0.4);
     let x0 = lo - pad, x1 = hi + pad;
@@ -642,7 +643,7 @@
     const yp = (y1 - y0) * 0.14; y0 -= yp; y1 += yp;
     const sx = x => ml + (x - x0) / (x1 - x0) * (W - ml - mr), sy = y => mt + (y1 - y) / (y1 - y0) * (H - mt - mb);
     const g = [];
-    const xs = niceStep((x1 - x0) / 7), yst = niceStep((y1 - y0) / 5);
+    const xs = niceStep((x1 - x0) / (narrow ? 5 : 7)), yst = niceStep((y1 - y0) / (narrow ? 4 : 5));
     for (let v = Math.ceil(x0 / xs) * xs; v <= x1 + 1e-9; v += xs) g.push(`<line class="${Math.abs(v) < 1e-9 ? 'axis' : 'grid'}" x1="${sx(v)}" x2="${sx(v)}" y1="${mt}" y2="${H - mb}"/><text x="${sx(v)}" y="${H - mb + 17}" text-anchor="middle">${fmtNum(v)}</text>`);
     for (let v = Math.ceil(y0 / yst) * yst; v <= y1 + 1e-9; v += yst) g.push(`<line class="${Math.abs(v) < 1e-9 ? 'axis' : 'grid'}" x1="${ml}" x2="${W - mr}" y1="${sy(v)}" y2="${sy(v)}"/><text x="${ml - 7}" y="${sy(v) + 4}" text-anchor="end">${fmtNum(v)}</text>`);
     const path = f => {
