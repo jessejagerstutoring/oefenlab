@@ -73,6 +73,7 @@ const Voortgang = (() => {
         if (topicId) {
           const t = c.topics[topicId] = c.topics[topicId] || { n: 0, c: 0, at: 0 };
           t.n++; if (clean) t.c++; t.at = Date.now();
+          t.r = [...(t.r || []), clean ? 1 : 0].slice(-5); // de laatste vijf pogingen
         }
         changed(id);
       },
@@ -106,5 +107,22 @@ const Voortgang = (() => {
     data = empty(); write(); emit();
   }
 
-  return { cursus, koppel, ontkoppel, flush, onChange: fn => listeners.add(fn) };
+  /* Hoe goed gaat een vaardigheid nu? Gebaseerd op de laatste vijf pogingen, zodat oude fouten
+     niet blijven hangen. Oudere voortgang zonder die lijst valt terug op de totalen. */
+  const STATUS = {
+    nieuw: { label: 'Nog niet geoefend', kort: 'Nieuw', teken: '○' },
+    lastig: { label: 'Lastig', kort: 'Lastig', teken: '!' },
+    bijna: { label: 'Bijna', kort: 'Bijna', teken: '◐' },
+    kan: { label: 'Kan ik', kort: 'Kan ik', teken: '✓' },
+  };
+  function status(t) {
+    if (!t || !t.n) return 'nieuw';
+    const r = t.r && t.r.length ? t.r : [...Array(Math.min(5, t.n - t.c)).fill(0), ...Array(Math.min(5, t.c)).fill(1)].slice(-5);
+    const goed = r.reduce((s, x) => s + x, 0);
+    if (r.length >= 3 && goed >= r.length - 1 && goed >= 3) return 'kan';
+    if (goed >= Math.ceil(r.length / 2)) return 'bijna';
+    return 'lastig';
+  }
+
+  return { cursus, koppel, ontkoppel, flush, onChange: fn => listeners.add(fn), status, STATUS };
 })();

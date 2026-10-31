@@ -477,3 +477,54 @@ dialog::backdrop { background: rgba(20, 22, 40, .35); }
 .prose b { color: var(--ink); }
 .prose .lead { font-size: 19px; color: var(--ink); font-weight: 600; }
 .foot a { color: var(--ink-2); font-weight: 700; }
+
+/* =====================================================================
+   Vaardigheden: kaart, status en uitleg
+   ===================================================================== */
+.topic { padding: 0; gap: 0; cursor: default; }
+.topic-go {
+  display: flex; flex-direction: column; gap: 10px; width: 100%; padding: 18px 18px 14px; border: 0; background: none;
+  text-align: left; cursor: pointer; color: inherit; border-radius: 18px;
+}
+.topic-learn {
+  display: inline-flex; align-items: center; gap: 6px; align-self: flex-start; margin: 0 18px 16px; padding: 6px 12px; min-height: 36px;
+  border-radius: 10px; border: 2px solid var(--line); background: var(--bg); font-weight: 800; font-size: 14px; color: var(--ink-2); cursor: pointer;
+}
+.topic-learn:hover { border-color: var(--line-2); background: var(--soft); }
+.topic-learn svg { width: 16px; height: 16px; color: #7c3aed; }
+.topic .freq { font-size: 13px; font-weight: 700; color: var(--muted); }
+.sym { font-family: var(--display); font-weight: 700; font-size: 34px; }
+.st { padding: 2px 9px; border-radius: 999px; font-weight: 800; font-size: 12.5px; white-space: nowrap; }
+.st-kan { background: var(--green-soft); color: var(--green-ink); }
+.st-bijna { background: var(--amber-soft); color: var(--amber-ink); }
+.st-lastig { background: var(--red-soft); color: var(--red-ink); }
+.st-nieuw { background: var(--soft); color: var(--ink-2); }
+.dots { display: inline-flex; gap: 4px; }
+.dots i { width: 9px; height: 9px; border-radius: 50%; background: var(--line); }
+.dots i.g { background: var(--green); }
+.dots i.f { background: #f2a5a8; }
+@media (max-width: 560px) { .topic-go { padding: 12px 12px 10px; } .topic-learn { margin: 0 12px 12px; } .sym { font-size: 26px; } .topic .freq { font-size: 12px; } }
+
+.learn { padding-block: 24px 72px; display: flex; flex-direction: column; gap: 24px; max-width: 900px; }
+.learn-head { display: flex; flex-direction: column; gap: 10px; }
+.learn-head h1 { font-size: clamp(2rem, 4.4vw, 2.8rem); font-weight: 700; }
+.learn-head .lead { margin: 0; font-size: 19px; color: var(--ink); font-weight: 600; max-width: 60ch; }
+.learn-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+@media (max-width: 760px) { .learn-grid { grid-template-columns: minmax(0, 1fr); } }
+.lcard { border: 2px solid var(--line); border-radius: 20px; padding: 18px 20px; display: flex; flex-direction: column; gap: 10px; animation: rise .45s var(--ease) backwards; }
+.lcard:nth-child(2) { animation-delay: 60ms; } .lcard:nth-child(3) { animation-delay: 120ms; } .lcard:nth-child(4) { animation-delay: 180ms; }
+.lcard h2 { font-size: 20px; }
+.lcard p { margin: 0; color: var(--ink-2); font-size: 16.5px; }
+.lsteps { margin: 0; padding-left: 22px; display: flex; flex-direction: column; gap: 8px; color: var(--ink-2); font-size: 16px; }
+.lsteps li::marker { font-weight: 800; color: var(--ink); }
+.lvb { background: var(--soft); border-color: var(--soft); }
+.lq { font-weight: 800; color: var(--ink) !important; }
+.luitw { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; font-weight: 700; font-size: 17px; }
+.luitw li { padding: 8px 12px; border-radius: 12px; background: var(--bg); }
+.lvb .btn { align-self: flex-start; min-height: 40px; }
+.lwarn { background: var(--amber-soft); border-color: var(--amber-soft); }
+.lwarn h2, .lwarn p { color: var(--amber-ink); }
+.learn-act { display: flex; gap: 10px; flex-wrap: wrap; }
+.plot .shade { fill: #ddd0fd; stroke: none; }
+
+.resume .btn.big { white-space: normal; text-align: center; }

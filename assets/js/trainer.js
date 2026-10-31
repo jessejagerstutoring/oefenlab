@@ -51,7 +51,14 @@
     lijnen: c => `<svg viewBox="0 0 124 72" aria-hidden="true"><path d="M6 62 L 118 10" stroke="${c}" stroke-width="4" stroke-linecap="round"/><path d="M6 20 L 118 56" stroke="#e08600" stroke-width="3.5" stroke-linecap="round" stroke-dasharray="7 6"/><circle cx="70" cy="33" r="6" fill="#fff" stroke="${c}" stroke-width="3"/></svg>`,
     rijen: c => `<svg viewBox="0 0 124 72" aria-hidden="true"><rect x="8" y="46" width="16" height="20" rx="4" fill="${c}"/><rect x="31" y="36" width="16" height="30" rx="4" fill="${c}"/><rect x="54" y="26" width="16" height="40" rx="4" fill="${c}"/><rect x="77" y="16" width="16" height="50" rx="4" fill="${c}"/><rect x="100" y="6" width="16" height="60" rx="4" fill="${c}" opacity=".4"/></svg>`,
   };
-  const MIX = { id: 'mix', title: 'Alles door elkaar', blurb: 'Een mix, net als op het tentamen', color: '#1f9d55', soft: '#e8f8ef', art: 'mix' };
+  const MIX = { id: 'mix', title: 'Alles door elkaar', blurb: 'Een mix, net als op het tentamen', color: C.color || '#1f9d55', soft: '#e8f8ef', art: 'mix' };
+  const artFor = t => ART[t.art] ? ART[t.art](t.color) : `<span class="sym" style="color:${t.color}">${t.sym || '?'}</span>`;
+  const EA = typeof EXAMENANALYSE !== 'undefined' ? EXAMENANALYSE : null;
+  const VK = typeof VAK !== 'undefined' ? VAK : null;
+  const examInfo = id => EA && EA.vaardigheden[id] ? EA.vaardigheden[id] : null;
+  const skillInfo = id => VK && VK.vaardigheden[id] ? VK.vaardigheden[id] : null;
+  // het belangrijkste eerst: vaardigheden die op het tentamen de meeste punten opleveren
+  if (EA && !C.bank.length) C.topics.sort((a, b) => ((examInfo(b.id) || {}).punten || 0) - ((examInfo(a.id) || {}).punten || 0));
 
   /* ---------- formules zetten ---------- */
   function typeset(el) {
@@ -80,16 +87,18 @@
   /* ---------- schermen ---------- */
   function setView(v, push = true) {
     st.view = v;
-    $('v-home').hidden = v !== 'home'; $('v-exams').hidden = v !== 'exams'; $('v-practice').hidden = v !== 'practice';
+    ['home', 'exams', 'practice', 'learn'].forEach(k => { if ($('v-' + k)) $('v-' + k).hidden = v !== k; });
     const prac = v === 'practice';
     $('h-home').hidden = prac; $('h-close').hidden = !prac;
+    if (v === 'learn') { $('h-home').hidden = false; }
     $('h-bar').hidden = !prac || st.mode !== 'step'; $('h-count').hidden = !prac || st.mode !== 'step'; $('h-mode').hidden = !prac || st.mode === 'step';
     if (!prac) hideBar();
     if (v === 'home') renderHome();
     if (v === 'exams') renderExams();
+    if (v === 'learn') renderLearn();
     replay($('v-' + v), 'view-in');
     window.scrollTo(0, 0);
-    if (push) { try { history.pushState({ v }, '', v === 'home' ? location.pathname : '#' + (v === 'exams' ? 'tentamens' : 'oefenen')); } catch (e) {} }
+    if (push) { try { history.pushState({ v }, '', v === 'home' ? location.pathname : '#' + ({ exams: 'tentamens', practice: 'oefenen', learn: 'uitleg' })[v]); } catch (e) {} }
   }
   addEventListener('popstate', () => setView('home', false));
   $('h-close').onclick = () => { try { if (history.state && history.state.v) return history.back(); } catch (e) {} setView('home', false); };
@@ -105,17 +114,19 @@
   function seg(items, value, attr) {
     return `<div class="seg" role="radiogroup">${items.map(([v, t]) => `<button type="button" role="radio" aria-checked="${v === value}" data-${attr}="${v}">${t}</button>`).join('')}</div>`;
   }
+  function dots(r) { return `<span class="dots" aria-hidden="true">${[0, 1, 2, 3, 4].map(i => `<i class="${r && i < r.length ? (r[i] ? 'g' : 'f') : ''}"></i>`).join('')}</span>`; }
   function topicCard(t, i) {
-    const pr = t.id === 'mix' ? null : V.topic(t.id), pct = pr ? Math.min(100, pr.c / GOAL * 100) : 0;
-    const meta = !pr ? `<span>Alle onderwerpen</span>`
-      : pr.c >= GOAL ? `<span class="bar" style="--c:${t.color}"><i style="--w:100%"></i></span><span class="done-tag">Onder de knie</span>`
-      : pr.n ? `<span class="bar" style="--c:${t.color}"><i style="--w:${pct}%"></i></span><span>${pr.c}/${GOAL}</span>`
-      : `<span class="bar"><i style="--w:0%"></i></span><span>Nieuw</span>`;
-    return `<button type="button" class="card topic" data-topic="${t.id}" style="--i:${i}">
-      <span class="art" style="--s:${t.soft}">${ART[t.art](t.color)}</span>
-      <b>${t.title}</b><span class="meta">${meta}</span></button>`;
+    const pr = t.id === 'mix' ? null : V.topic(t.id), stt = pr ? Voortgang.status(pr) : null, info = examInfo(t.id);
+    const meta = !pr ? `<span>Alle vaardigheden door elkaar</span>`
+      : `<span class="st st-${stt}">${Voortgang.STATUS[stt].teken} ${Voortgang.STATUS[stt].kort}</span>${pr.n ? dots(pr.r) : ''}`;
+    const freq = info ? `<span class="freq">In ${info.tentamens} van ${EA.tentamens} tentamens</span>` : '';
+    const learn = t.id !== 'mix' && skillInfo(t.id) ? `<button type="button" class="topic-learn" data-learn="${t.id}">${ICON.book}Uitleg</button>` : '';
+    return `<div class="card topic" style="--i:${i}">
+      <button type="button" class="topic-go" data-topic="${t.id}" aria-label="Oefen ${t.title}">
+        <span class="art" style="--s:${t.soft}">${artFor(t)}</span>
+        <b>${t.title}</b>${freq}<span class="meta">${meta}</span></button>${learn}</div>`;
   }
-  function nextTopic() { return C.topics.find(t => V.topic(t.id).c < GOAL) || null; }
+  function nextTopic() { return C.topics.find(t => Voortgang.status(V.topic(t.id)) !== 'kan') || null; }
   function heroCard() {
     const r = V.resume;
     if (r) {
@@ -126,43 +137,44 @@
       const art = t || { soft: '#fde8f1', color: '#db2777', art: 'mix' };
       return `<div class="card resume" style="--i:1">
         <span class="eyebrow">Ga verder</span>
-        <div class="resume-row"><span class="art" style="--s:${art.soft}">${ART[art.art](art.color)}</span><div><b>${title}</b><span>${sub}</span></div></div>
+        <div class="resume-row"><span class="art" style="--s:${art.soft}">${artFor(art)}</span><div><b>${title}</b><span>${sub}</span></div></div>
         <button class="btn primary big" id="b-resume">Verder oefenen ${ICON.arrow}</button></div>`;
     }
     if (!V.stats.n) return `<div class="card resume" style="--i:1">
         <span class="eyebrow">Nieuw hier? Zo werkt het</span>
-        <ol class="steps3"><li><i>1</i>Kies een onderwerp</li><li><i>2</i>Los de som op in kleine stappen</li><li><i>3</i>Schrijf de uitwerking over, net als op je tentamen</li></ol>
-        <button class="btn primary big" data-topic="${C.topics[0].id}">Begin met ${C.topics[0].short.toLowerCase()} ${ICON.arrow}</button></div>`;
+        <ol class="steps3"><li><i>1</i>Kies ${C.bank.length ? 'een onderwerp' : 'een vaardigheid'}</li><li><i>2</i>Los de som op in kleine stappen</li><li><i>3</i>Schrijf de uitwerking over, net als op je tentamen</li></ol>
+        <button class="btn primary big" data-topic="${C.topics[0].id}">Begin met de belangrijkste ${ICON.arrow}</button></div>`;
     const t = nextTopic();
     if (!t) return `<div class="card resume" style="--i:1"><span class="eyebrow">Alles onder de knie</span><b style="font-size:18px">Klaar voor het echte werk?</b><span style="color:var(--muted);font-weight:700">Maak een heel voorbeeldtentamen, helemaal zelf.</span><button class="btn primary big" id="b-toexams">Tentamen maken ${ICON.arrow}</button></div>`;
-    const pr = V.topic(t.id);
+    const pr = V.topic(t.id), stt = Voortgang.status(pr);
     return `<div class="card resume" style="--i:1">
       <span class="eyebrow">Aanrader voor nu</span>
-      <div class="resume-row"><span class="art" style="--s:${t.soft}">${ART[t.art](t.color)}</span><div><b>${t.title}</b><span>${pr.c}/${GOAL} zonder hulp</span></div></div>
-      <div class="bar" style="--c:${t.color}"><i style="--w:${pr.c / GOAL * 100}%"></i></div>
-      <button class="btn primary big" data-topic="${t.id}">Oefen ${t.short.toLowerCase()} ${ICON.arrow}</button></div>`;
+      <div class="resume-row"><span class="art" style="--s:${t.soft}">${artFor(t)}</span><div><b>${t.title}</b><span>${Voortgang.STATUS[stt].label}${pr.n ? ` · ${pr.n} keer geoefend` : ''}</span></div></div>
+      <button class="btn primary big" data-topic="${t.id}">Oefen deze vaardigheid ${ICON.arrow}</button></div>`;
   }
   function renderHome() {
     const el = $('v-home');
     el.innerHTML = `
       <section class="home-hero">
-        <div class="hero-t"><h1>Wat ga je vandaag oefenen?</h1><p>Kies een onderwerp. Je lost elke som op in kleine stappen en ziet meteen of je goed zit.</p></div>
+        <div class="hero-t"><h1>${C.home ? C.home.titel : 'Wat ga je vandaag oefenen?'}</h1><p>${C.home ? C.home.tekst : 'Kies een onderwerp. Je lost elke som op in kleine stappen en ziet meteen of je goed zit.'}</p></div>
         ${heroCard()}
       </section>
       <section>
-        <div class="section-h"><h2>Onderwerpen</h2>
+        <div class="section-h"><h2>${C.bank.length ? 'Onderwerpen' : 'Vaardigheden'}</h2>
           <div class="settings"><span class="setting"><span class="lab">Werkwijze</span>${seg(MODES, st.mode, 'mode')}</span><span class="setting"><span class="lab">Niveau</span>${seg(LEVELS, st.level, 'level')}</span></div>
         </div>
         <div class="topics">${[MIX, ...C.topics].map(topicCard).join('')}</div>
       </section>
-      <section class="extras">
+      <section class="extras"${C.bank.length ? '' : ' hidden'}>
         <button type="button" class="card dark extra" id="b-exams" style="--i:2"><span><b>Tentamen maken</b><span>Een heel voorbeeldtentamen, met je score</span></span>${ICON.arrow}</button>
         <button type="button" class="card extra" id="b-bank" style="--i:3"><span><b>Echte tentamenvragen</b><span>${C.bank.length} vragen uit oude tentamens, door elkaar</span></span>${ICON.arrow}</button>
       </section>`;
     el.querySelectorAll('[data-topic]').forEach(b => b.onclick = () => startPractice({ source: 'new', topic: b.dataset.topic }));
+    el.querySelectorAll('[data-learn]').forEach(b => b.onclick = () => openLearn(b.dataset.learn));
     el.querySelectorAll('[data-mode]').forEach(b => b.onclick = () => { st.mode = b.dataset.mode; V.setPrefs({ mode: st.mode }); renderHome(); });
     el.querySelectorAll('[data-level]').forEach(b => b.onclick = () => { st.level = b.dataset.level; V.setPrefs({ level: st.level }); renderHome(); });
     $('b-exams').onclick = () => setView('exams');
+    if (!C.bank.length) $('b-bank').onclick = null;
     $('b-bank').onclick = () => startPractice({ source: 'bank', topic: 'mix' });
     if ($('b-resume')) $('b-resume').onclick = resume;
     if ($('b-toexams')) $('b-toexams').onclick = () => setView('exams');
@@ -183,6 +195,39 @@
     $('b-back').onclick = () => $('h-close').onclick();
     el.querySelectorAll('[data-mode]').forEach(b => b.onclick = () => { st.mode = b.dataset.mode; V.setPrefs({ mode: st.mode }); renderExams(); });
     el.querySelectorAll('[data-exam]').forEach(b => b.onclick = () => startPractice({ source: 'exam', examN: +b.dataset.exam }));
+  }
+
+  /* ---------- uitleg bij een vaardigheid ---------- */
+  function openLearn(id) { st.learn = id; setView('learn'); }
+  function renderLearn() {
+    const id = st.learn, v = skillInfo(id), t = topicOf(id), info = examInfo(id), el = $('v-learn');
+    if (!v || !el) return setView('home', false);
+    const o = VK.onderdelen.find(x => x.id === v.onderdeel);
+    el.innerHTML = `
+      <button class="btn ghost backlink" id="l-back">${ICON.back}Terug</button>
+      <section class="learn-head" style="--c:${o.kleur};--s:${o.zacht}">
+        <span class="eyebrow" style="color:${o.kleur}">${o.titel}</span>
+        <h1>${v.titel}</h1>
+        <p class="lead">${v.kort}</p>
+        ${info ? `<div class="chips" style="justify-content:flex-start"><span class="chip" style="--i:0">In ${info.tentamens} van ${EA.tentamens} tentamens</span><span class="chip" style="--i:1">${info.deelvragen} deelvragen</span>${info.punten ? `<span class="chip" style="--i:2">${info.punten} punten in totaal</span>` : ''}</div>` : ''}
+      </section>
+      <div class="learn-grid">
+        <section class="lcard"><h2>Zo herken je het</h2><p>${v.herken}</p></section>
+        <section class="lcard"><h2>Stappenplan</h2><ol class="lsteps">${v.stappen.map(x => `<li>${x}</li>`).join('')}</ol></section>
+        <section class="lcard lvb"><h2>Voorbeeld</h2><p class="lq">${v.voorbeeld.vraag}</p>
+          <ol class="luitw" id="l-uitw">${v.voorbeeld.regels.map((x, i) => `<li${i ? ' hidden' : ''}>${x}</li>`).join('')}</ol>
+          ${v.voorbeeld.regels.length > 1 ? `<button class="btn" id="l-more">Volgende regel ${ICON.arrow}</button>` : ''}</section>
+        <section class="lcard lwarn"><h2>Let op</h2><p>${v.valkuil}</p></section>
+      </div>
+      <div class="learn-act">${t ? `<button class="btn primary big" id="l-go">Oefen deze vaardigheid ${ICON.arrow}</button>` : ''}</div>`;
+    $('l-back').onclick = () => $('h-close').onclick();
+    if ($('l-go')) $('l-go').onclick = () => startPractice({ source: 'new', topic: id });
+    if ($('l-more')) $('l-more').onclick = () => {
+      const next = $('l-uitw').querySelector('li[hidden]');
+      if (next) { next.hidden = false; replay(next, 'view-in'); }
+      if (!$('l-uitw').querySelector('li[hidden]')) $('l-more').hidden = true;
+    };
+    typeset(el);
   }
 
   /* ---------- oefenen starten ---------- */
@@ -613,7 +658,14 @@
       }
       return d;
     };
-    const curves = spec.curves.map((c, i) => `<path class="c${i ? 2 : 1} ${animate ? (i ? 'fade' : 'draw') : ''}" ${i ? '' : 'pathLength="1"'} d="${path(c.f)}"/>`).join('');
+    let shade = '';
+    if (spec.shade) {
+      const f0 = spec.curves[0].f, a0 = Math.max(x0, spec.shade.from), a1 = Math.min(x1, spec.shade.to);
+      let d = `M${sx(a0).toFixed(1)} ${sy(0).toFixed(1)}`;
+      for (let i = 0; i <= 120; i++) { const x = a0 + (a1 - a0) * i / 120; d += ` L${sx(x).toFixed(1)} ${sy(f0(x)).toFixed(1)}`; }
+      shade = `<path class="shade" d="${d} L${sx(a1).toFixed(1)} ${sy(0).toFixed(1)} Z"/>`;
+    }
+    const curves = shade + spec.curves.map((c, i) => `<path class="c${i ? 2 : 1} ${animate ? (i ? 'fade' : 'draw') : ''}" ${i ? '' : 'pathLength="1"'} d="${path(c.f)}"/>`).join('');
     let marks = '';
     if (spec.given && !done) marks += `<circle class="pt" cx="${sx(spec.given.x)}" cy="${sy(spec.given.y)}" r="5.5"/>`;
     if (done) spec.marks.forEach((m, i) => {
@@ -634,7 +686,9 @@
     st.level = V.prefs.level || st.level; st.mode = V.prefs.mode || st.mode;
     if (st.view === 'home') renderHome(); else if (st.view === 'exams') renderExams(); else if (st.prob) renderStats();
   });
+  const deep = (location.hash || '').match(/^#(leer|oefen)-([\w-]+)$/);
   try { if (location.hash) history.replaceState(null, '', location.pathname); } catch (e) {}
   setView('home', false);
+  if (deep && topicOf(deep[2])) { deep[1] === 'leer' && skillInfo(deep[2]) ? openLearn(deep[2]) : startPractice({ source: 'new', topic: deep[2] }); }
   Account.init({ courses: [C.id], root: '../' });
 })();

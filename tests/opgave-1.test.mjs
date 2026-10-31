@@ -10,7 +10,7 @@ import vm from 'node:vm';
 
 const file = new URL('../content/wiskunde-a/opgave-1.js', import.meta.url);
 const ctx = vm.createContext({ console });
-vm.runInContext(readFileSync(file, 'utf8') + ';this.COURSE = COURSE;', ctx);
+vm.runInContext(readFileSync(new URL("../content/gedeeld.js", import.meta.url), "utf8") + "\n" + readFileSync(file, "utf8") + ";this.COURSE = COURSE;", ctx);
 const C = ctx.COURSE;
 
 const SAMPLES = 60;
