@@ -466,3 +466,14 @@ dialog::backdrop { background: rgba(20, 22, 40, .35); }
   .dash-row { grid-template-columns: minmax(0, 1fr) auto auto; }
   .dash-topics { grid-column: 1 / -1; grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
+
+/* tekstpagina's, zoals privacy */
+.prose { max-width: 720px; padding-block: 40px 64px; }
+.prose h1 { font-size: clamp(2rem, 4.4vw, 2.8rem); font-weight: 700; margin-bottom: 12px; }
+.prose h2 { font-size: 22px; margin: 32px 0 8px; }
+.prose p, .prose li { color: var(--ink-2); font-size: 17px; line-height: 1.65; }
+.prose p { margin: 0 0 12px; }
+.prose ul { margin: 0 0 12px; padding-left: 22px; display: flex; flex-direction: column; gap: 6px; }
+.prose b { color: var(--ink); }
+.prose .lead { font-size: 19px; color: var(--ink); font-weight: 600; }
+.foot a { color: var(--ink-2); font-weight: 700; }

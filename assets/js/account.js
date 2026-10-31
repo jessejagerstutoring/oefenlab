@@ -125,7 +125,7 @@ const Account = (() => {
           <p class="acc-msg" id="acc-msg" role="alert"></p>
           <button class="btn primary big" type="submit" id="acc-submit">Inloggen</button>
           <button class="linkbtn" type="button" id="acc-forgot">Wachtwoord vergeten?</button>
-          <p class="note" id="acc-why">Met een account wordt je voortgang bewaard, ook op een andere computer of je telefoon. We bewaren alleen je voornaam, je e-mailadres en je voortgang. Je begeleider kan je voortgang zien.</p>
+          <p class="note" id="acc-why">Met een account wordt je voortgang bewaard, ook op een andere computer of je telefoon. We bewaren alleen je voornaam, je e-mailadres en je voortgang. Je begeleider kan je voortgang zien. <a href="${root}privacy.html" target="_blank" rel="noopener">Lees meer over privacy</a>.</p>
         </form>
       </dialog>`);
     $('acc-close').onclick = () => $('acc-dlg').close();
