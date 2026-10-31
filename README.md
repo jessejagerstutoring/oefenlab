@@ -9,26 +9,36 @@ Gratis oefenplatform voor CCVX-tentamens. Eerste concept: Wiskunde A, opgave 1.
 
 ## Hoe het in elkaar zit
 
+Alles volgt dezelfde lijn: **examen bekijken → vragen indelen → vaardigheden begrijpen → uitleg → oefenen → controleren of het aansluit op het examen.**
+
 ```
+analyse/wiskunde-a/              (in de privé-repo, niet online)
+  bouw_databank.py               leest alle voorbeeldtentamens en deelt elke deelvraag in per vaardigheid
+  databank.json                  alle 462 deelvragen met tekst en vaardigheid
+  RAPPORT.md                     wat komt hoe vaak terug, met hoeveel punten
+
 website/
-  index.html                     startpagina van het platform (vakken)
-  wiskunde-a/opgave-1.html       de trainer voor opgave 1
-  content/wiskunde-a/opgave-1.js alle inhoud: sommen, tentamenvragen, theorie, antwoordcontrole
-  assets/js/trainer.js           de trainer zelf: menu, stappen, feedback, tentamens
+  index.html                     startpagina van het platform
+  wiskunde-a/index.html          overzicht van Wiskunde A: zes onderdelen, "werk hier eerst aan"
+  wiskunde-a/voortgang.html      mijn voortgang per vaardigheid
+  wiskunde-a/<onderdeel>.html    één trainer per onderdeel (opgave-1, optimaliseren, kansrekening,
+                                 normaal-en-toetsen, periodiek, groeimodellen)
   begeleider.html                overzicht van alle leerlingen (alleen voor begeleiders)
-  assets/js/progress.js          voortgang van de leerling (browser, en account als je bent ingelogd)
+  content/gedeeld.js             rekenhulpjes, stappen, antwoordcontrole
+  content/wiskunde-a/vak.js      de zes onderdelen en 37 vaardigheden, met uitleg per vaardigheid
+  content/wiskunde-a/examenanalyse.js   tellingen uit de databank (gegenereerd, geen vraagteksten)
+  content/wiskunde-a/<onderdeel>.js     de sommen-generators per onderdeel
+  assets/js/trainer.js           de trainer: menu, uitleg, stappen, feedback
+  assets/js/overzicht.js         het vakoverzicht en mijn voortgang
+  assets/js/progress.js          voortgang (browser, en account als je bent ingelogd)
   assets/js/account.js           inloggen, account maken, uitloggen
-  assets/js/config.js            instellingen: de Supabase-gegevens
-  assets/css/app.css             het ontwerp, gedeeld door alle pagina's
   supabase/schema.sql            database en beveiligingsregels voor Supabase
-  tests/opgave-1.test.mjs        controleert alle sommen
+  tests/                         controleren alle sommen
 ```
 
-Het belangrijkste principe: **inhoud en app zijn gescheiden.**
-
-- Een inhoudsbestand eindigt met een `COURSE`-object (onderwerpen, generators, tentamenvragen, theorie, antwoordcontrole). Er zit geen opmaak in.
-- `trainer.js` weet niets van wiskunde en werkt met elk `COURSE`-object.
-- Een nieuwe opgave of een nieuw vak is dus: een nieuw inhoudsbestand plus een pagina die het laadt, zoals `wiskunde-a/opgave-1.html`.
+- **Vaardigheden zijn de kern.** Elke som hoort bij precies één vaardigheid uit `vak.js`. Daaraan hangen de uitleg, de voortgang ("kan ik", "bijna", "lastig") en de tellingen uit de examens.
+- **Inhoud en app zijn gescheiden.** Een onderdeel levert alleen generators aan via `maakOnderdeel()`. De trainer weet niets van wiskunde.
+- **Nieuwe tentamens of Wiskunde B:** zet de teksten in `analyse/<vak>/teksten`, draai `bouw_databank.py`, vul `vak.js` aan en voeg generators toe.
 
 ## Testen
 
@@ -36,14 +46,16 @@ Vanuit de map `website`:
 
 ```
 node tests/opgave-1.test.mjs
+node tests/onderdelen.test.mjs
 ```
 
-De test maakt duizenden sommen op alle niveaus, plus alle echte tentamenvragen. Hij controleert:
+De tests maken samen ruim 17.000 sommen op alle niveaus, plus alle echte opgave 1-vragen. Ze controleren:
 
 - dat elke meerkeuzestap precies één goed antwoord heeft;
 - dat de eindantwoorden de vergelijking echt oplossen;
 - dat hellingen kloppen met de grafiek;
-- dat de app het juiste antwoord ook goedkeurt.
+- dat de app het juiste antwoord ook goedkeurt, als breuk én netjes afgerond;
+- bij elke som met een eigen controle (`verify`) dat het antwoord op een andere manier narekent.
 
 Draai hem na elke wijziging aan de inhoud.
 

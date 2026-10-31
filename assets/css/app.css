@@ -456,7 +456,7 @@ dialog::backdrop { background: rgba(20, 22, 40, .35); }
 .dash-num { display: flex; flex-direction: column; }
 .dash-num b { font-family: var(--display); font-weight: 700; font-size: 24px; line-height: 1.1; font-variant-numeric: tabular-nums; }
 .dash-num span { font-size: 12px; color: var(--muted); font-weight: 700; }
-.dash-topics { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 8px; }
+.dash-topics { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; }
 .dash-topic { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
 .dash-topic .bar { height: 8px; }
 .dash-topic small { font-size: 11px; font-weight: 700; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -464,7 +464,7 @@ dialog::backdrop { background: rgba(20, 22, 40, .35); }
 .dash-exams .chip { animation: none; }
 @media (max-width: 860px) {
   .dash-row { grid-template-columns: minmax(0, 1fr) auto auto; }
-  .dash-topics { grid-column: 1 / -1; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .dash-topics { grid-column: 1 / -1; grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 
 /* tekstpagina's, zoals privacy */
@@ -528,3 +528,47 @@ dialog::backdrop { background: rgba(20, 22, 40, .35); }
 .plot .shade { fill: #ddd0fd; stroke: none; }
 
 .resume .btn.big { white-space: normal; text-align: center; }
+
+/* =====================================================================
+   Vakoverzicht en Mijn voortgang
+   ===================================================================== */
+.ring-card { flex-direction: row; align-items: center; gap: 18px; color: inherit; text-decoration: none; cursor: pointer; }
+.ring-card:hover { transform: translateY(-3px); border-color: var(--line-2); }
+.ring-card > span { display: flex; flex-direction: column; gap: 4px; }
+.ring-card b { font-size: 18px; }
+.ring-card .sub { color: var(--muted); font-weight: 700; font-size: 14px; }
+.tips { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+@media (max-width: 860px) { .tips { grid-template-columns: minmax(0, 1fr); } }
+.tip-card { cursor: default; background: var(--s); border-color: var(--s); gap: 10px; }
+.tip-card:hover { transform: none; border-color: var(--s); }
+.tip-card b { font-size: 19px; line-height: 1.25; }
+.tip-meta { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: 13px; font-weight: 700; color: var(--ink-2); }
+.tip-act { display: flex; gap: 8px; flex-wrap: wrap; margin-top: auto; }
+.onderdelen { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 330px), 1fr)); gap: 16px; }
+.onderdeel { gap: 10px; }
+.od-top { display: flex; align-items: center; gap: 14px; }
+.od-top > span:last-child { display: flex; flex-direction: column; }
+.od-top b { font-size: 19px; line-height: 1.25; }
+.od-sym { width: 60px; height: 60px; flex: none; border-radius: 16px; display: grid; place-items: center; font-family: var(--display); font-weight: 700; font-size: 24px; }
+.od-blurb { color: var(--ink-2); font-size: 15px; }
+.od-chips { display: flex; flex-wrap: wrap; gap: 6px; font-size: 12.5px; font-weight: 800; color: var(--ink-2); }
+.od-chips span { padding: 3px 9px; border-radius: 999px; background: var(--soft); }
+.onderdeel .meta { display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 800; color: var(--muted); }
+.onderdeel .meta .bar { flex: 1; }
+.exam-info { border-radius: 22px; background: var(--soft); padding: 22px 24px; display: flex; flex-direction: column; gap: 10px; }
+.exam-info h2 { font-size: 22px; }
+.exam-info ul { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 8px; color: var(--ink-2); }
+.exam-info b { color: var(--ink); }
+.vg { gap: 22px; }
+.vg-h { font-size: clamp(2rem, 4.4vw, 2.8rem); font-weight: 700; }
+.legend-st { display: flex; flex-wrap: wrap; gap: 6px; }
+.vg-block { border: 2px solid var(--line); border-radius: 20px; padding: 16px 18px; display: flex; flex-direction: column; gap: 8px; }
+.vg-head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.vg-head b { font-size: 18px; flex: 1; }
+.vg-head > span { font-weight: 800; color: var(--muted); }
+.vg-head a { font-weight: 800; font-size: 14px; }
+.vg-list { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; }
+.vg-list li { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-top: 2px solid var(--soft); flex-wrap: wrap; }
+.vg-name { flex: 1 1 220px; display: flex; flex-direction: column; font-weight: 700; }
+.vg-name small { font-size: 13px; color: var(--muted); font-weight: 600; }
+.vg-act { display: flex; gap: 12px; font-weight: 800; font-size: 14px; }

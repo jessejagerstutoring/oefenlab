@@ -121,7 +121,8 @@ function checkAns(expected, txt, dp = 3) {
   if (!vals || !vals.length) return { ok: false, msg: 'Ik kan dit niet goed lezen. Typ alleen getallen met een puntkomma ertussen, bijvoorbeeld 0 ; 1/3 ; -2 of 1,683.' };
   const u = uniqSort(vals);
   if (u.length !== exps.length) return { ok: false, msg: `Je gaf ${u.length} ${u.length === 1 ? 'getal' : 'getallen'}, maar er ${exps.length === 1 ? 'hoort er maar 1 te zijn' : `horen er ${exps.length} te zijn`}. ${u.length < exps.length ? 'Mis je er nog een?' : 'Klopt er eentje niet?'}` };
-  const tol = v => asFrac(v) ? 0.0006 : 0.5 * Math.pow(10, -dp) + 1e-9;
+  // goed: de exacte breuk, of netjes afgerond op het gevraagde aantal decimalen
+  const tol = v => Math.max(asFrac(v) ? 0.0006 : 0, 0.5 * Math.pow(10, -dp) + 1e-9);
   const used = new Set();
   for (const e of exps) {
     const i = u.findIndex((v, j) => !used.has(j) && Math.abs(v - e) <= tol(e));
@@ -172,10 +173,14 @@ function maakOnderdeel({ onderdeel, gens, home }) {
       return p;
     },
     checkAns,
-    ansText,
+    ansText: ansDec,
     plotSpec: () => null,
   };
 }
 /* getallen netjes in een zin: 1234,5 en 1,25 */
 const nl = (x, dp = 2) => { let s = dec(x, dp); if (s.includes(',')) s = s.replace(/0+$/, '').replace(/,$/, ''); return s; };
 const mathAns = (x, dp) => `\\(${dec(x, dp).replace(',', '{,}')}\\)`;
+/* decimale getallen in formules, zoals het tentamen ze schrijft (geen breuken als 5/4) */
+function td(x, dp = 3) { let s = dec(x, dp); if (s.includes(',')) s = s.replace(/0+$/, '').replace(/,$/, ''); return s.replace(',', '{,}'); }
+const eqd = (x, dp = 3) => (Math.abs(x - Number(dec(x, dp).replace(',', '.'))) < 1e-9 ? '= ' : '\\approx ') + td(x, dp);
+const ansDec = (arr, dp = 3) => arr.length ? uniqSort(arr).map(v => nl(v, dp)).join(' ; ') : 'geen';

@@ -26,13 +26,14 @@
 </main>
 
 <script src="assets/js/config.js"></script>
-<script src="content/wiskunde-a/opgave-1.js"></script>
+<script src="content/wiskunde-a/vak.js"></script>
 <script src="assets/js/progress.js"></script>
 <script src="assets/js/account.js"></script>
 <script>
 (() => {
   'use strict';
-  const C = COURSE, GOAL = 5, $ = id => document.getElementById(id), esc = Account.esc;
+  const $ = id => document.getElementById(id), esc = Account.esc;
+  const OND = VAK.onderdelen.map(o => ({ ...o, course: o.id === 'algebra' ? 'wiskunde-a-opgave-1' : `wiskunde-a-${o.id}`, skills: Object.keys(VAK.vaardigheden).filter(k => VAK.vaardigheden[k].onderdeel === o.id) }));
   const num = v => (Number.isFinite(Number(v)) ? Number(v) : 0);
   const DAY = 864e5;
   let rows = [];
@@ -58,19 +59,26 @@
     const sb = Account.client;
     const [{ data: profiles, error: e1 }, { data: progress, error: e2 }] = await Promise.all([
       sb.from('profiles').select('id, display_name, email, role, created_at'),
-      sb.from('progress').select('user_id, data, updated_at').eq('course_id', C.id),
+      sb.from('progress').select('user_id, course_id, data, updated_at').in('course_id', OND.map(o => o.course)),
     ]);
     if (e1 || e2) return message('Laden mislukt', 'De gegevens konden niet worden opgehaald. Probeer het later opnieuw.');
-    const byUser = new Map((progress || []).map(p => [p.user_id, p]));
+    const byUser = new Map();
+    (progress || []).forEach(p => { if (!byUser.has(p.user_id)) byUser.set(p.user_id, {}); byUser.get(p.user_id)[p.course_id] = p.data || {}; });
     rows = (profiles || []).filter(p => p.role !== 'begeleider').map(p => {
-      const pr = byUser.get(p.id), d = (pr && pr.data) || {};
-      const stats = d.stats || {}, topics = d.topics || {}, exams = d.exams || {};
-      const last = Math.max(0, ...C.topics.map(t => num((topics[t.id] || {}).at)), ...Object.values(exams).map(x => num(x && x.at)));
+      const all = byUser.get(p.id) || {};
+      let n = 0, c = 0, last = 0;
+      const ond = OND.map(o => {
+        const d = all[o.course] || {}, topics = d.topics || {}, st = d.stats || {};
+        n += num(st.n); c += num(st.c);
+        const kan = o.skills.filter(k => topics[k] && Voortgang.status({ n: num(topics[k].n), c: num(topics[k].c), r: Array.isArray(topics[k].r) ? topics[k].r.map(x => (x ? 1 : 0)) : undefined }) === 'kan').length;
+        const lastig = o.skills.filter(k => topics[k] && Voortgang.status({ n: num(topics[k].n), c: num(topics[k].c), r: Array.isArray(topics[k].r) ? topics[k].r.map(x => (x ? 1 : 0)) : undefined }) === 'lastig').map(k => VAK.vaardigheden[k].titel);
+        o.skills.forEach(k => { if (topics[k]) last = Math.max(last, num(topics[k].at)); });
+        return { o, kan, lastig };
+      });
+      const ex = (all['wiskunde-a-opgave-1'] || {}).exams || {};
       return {
-        name: p.display_name || '(geen naam)', email: p.email || '', since: Date.parse(p.created_at) || 0,
-        n: num(stats.n), c: num(stats.c), last,
-        topics: C.topics.map(t => ({ t, c: num((topics[t.id] || {}).c), n: num((topics[t.id] || {}).n) })),
-        exams: Object.entries(exams).filter(([k]) => /^\d+$/.test(k)).map(([k, x]) => ({ n: +k, best: num(x && x.best), tot: num(x && x.tot) })).sort((a, b) => a.n - b.n),
+        name: p.display_name || '(geen naam)', email: p.email || '', n, c, last, ond,
+        exams: Object.entries(ex).filter(([k]) => /^\d+$/.test(k)).map(([k, x]) => ({ n: +k, best: num(x && x.best), tot: num(x && x.tot) })).sort((a, b) => a.n - b.n),
       };
     }).sort((a, b) => b.last - a.last || a.name.localeCompare(b.name));
     render('');
@@ -90,7 +98,7 @@
       </section>
       <section class="dash-tools">
         <label class="fld" style="flex:1 1 260px"><span class="sr">Zoek een leerling</span><input id="dash-q" placeholder="Zoek op naam of e-mailadres" value="${esc(q)}"></label>
-        <div class="dash-legend">${C.topics.map(t => `<span><i style="background:${t.color}"></i>${esc(t.short)}</span>`).join('')}</div>
+        <div class="dash-legend">${OND.map(o => `<span><i style="background:${o.kleur}"></i>${esc(o.titel)}</span>`).join('')}</div>
       </section>
       <section class="dash-list">
         ${list.length ? list.map((r, i) => `
@@ -98,11 +106,11 @@
             <div class="dash-who"><b>${esc(r.name)}</b><span>${esc(r.email)}</span><span>Laatst actief: ${when(r.last)}</span></div>
             <div class="dash-num"><b>${r.n}</b><span>gemaakt</span></div>
             <div class="dash-num"><b>${r.c}</b><span>zonder hulp</span></div>
-            <div class="dash-topics" aria-label="Voortgang per onderwerp">${r.topics.map(x => `
-              <span class="dash-topic" title="${esc(x.t.title)}: ${x.c} van ${GOAL} zonder hulp (${x.n} gemaakt)">
-                <span class="bar" style="--c:${x.t.color}"><i style="--w:${Math.min(100, x.c / GOAL * 100)}%"></i></span><small>${esc(x.t.short)}</small>
+            <div class="dash-topics" aria-label="Vaardigheden onder de knie per onderdeel">${r.ond.map(x => `
+              <span class="dash-topic" title="${esc(x.o.titel)}: ${x.kan} van ${x.o.skills.length} vaardigheden onder de knie">
+                <span class="bar" style="--c:${x.o.kleur}"><i style="--w:${x.kan / x.o.skills.length * 100}%"></i></span><small>${x.kan}/${x.o.skills.length}</small>
               </span>`).join('')}</div>
-            <div class="dash-exams">${r.exams.length ? r.exams.map(x => `<span class="chip">T${x.n}: ${x.best}/${x.tot}</span>`).join('') : '<span class="note">Nog geen tentamen gemaakt</span>'}</div>
+            <div class="dash-exams">${(() => { const l = r.ond.flatMap(x => x.lastig); return l.length ? `<span class="note" style="margin-right:4px">Lastig:</span>${l.slice(0, 6).map(t => `<span class="chip a">${esc(t)}</span>`).join('')}` : ''; })()}${r.exams.length ? r.exams.map(x => `<span class="chip">T${x.n}: ${x.best}/${x.tot}</span>`).join('') : ''}</div>
           </article>`).join('') : `<p class="note">${rows.length ? 'Geen leerling gevonden met deze zoekterm.' : 'Er heeft nog geen leerling een account gemaakt.'}</p>`}
       </section>`;
     const inp = $('dash-q');
