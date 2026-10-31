@@ -111,7 +111,7 @@ function buildTop(q) {
 
 const COURSE = maakOnderdeel({
   onderdeel: 'sinus',
-  home: { titel: 'Periodieke functies', tekst: 'Een sinusopgave zit in vrijwel elk tentamen. Het vaakst gevraagd: a, b, c en d bepalen uit een grafiek of een beschrijving.' },
+  home: { titel: 'Periodieke functies', tekst: 'Begin met wat het vaakst gevraagd wordt.' },
   gens: {
     sAbcd: { topic: 'sin-abcd', rand: randAbcd, build: buildAbcd, w: 3 },
     sTijdstip: { topic: 'sin-tijdstip', rand: randTijdstippen, build: buildTijdstippen, w: 2 },

@@ -10,71 +10,82 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@500;600;700;800&display=swap">
 <link rel="stylesheet" href="assets/css/app.css">
 </head>
-<body class="landing">
+<body class="site ">
 <header class="top">
   <div class="wrap">
-    <a class="brand" href="index.html">
-      <span class="logo" aria-hidden="true">O</span>
-      <span class="brand-t"><b>Oefenlab</b><small>Gratis oefenen voor je CCVX-tentamen</small></span>
-    </a>
-    <div class="top-act"><a class="btn hide-sm" href="wiskunde-a/index.html">Naar Wiskunde A</a><div id="account-slot"></div></div>
+    <a class="brand" href="index.html"><span class="logo" aria-hidden="true">O</span><span class="brand-t"><b>Oefenlab</b></span></a>
+    <nav class="site-nav" id="site-nav" aria-label="Hoofdmenu">
+      <a href="over.html">Over Oefenlab</a>
+      <a href="faq.html">Veelgestelde vragen</a>
+      <a href="blog.html">Blog</a>
+    </nav>
+    <div class="top-act">
+      <div class="lang">
+        <button class="btn ghost lang-btn" id="lang-btn" aria-haspopup="true" aria-expanded="false" aria-label="Taal kiezen">NL <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+        <div class="lang-menu" id="lang-menu" hidden>
+          <button type="button" data-lang="nl" aria-current="true">Nederlands</button>
+          <button type="button" data-lang="en">English <small>binnenkort</small></button>
+        </div>
+      </div>
+      <div id="account-slot"></div>
+      <button class="btn iconbtn ghost nav-toggle" id="nav-toggle" aria-label="Menu" aria-expanded="false" aria-controls="site-nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+    </div>
   </div>
+  <p class="lang-note" id="lang-note" role="status" hidden>The English version is coming soon.</p>
 </header>
 
-<main class="wrap">
+<main class="wrap landing-main">
   <section class="hero">
     <div class="hero-t">
       <span class="eyebrow">Gratis voor iedereen</span>
-      <h1>Oefen voor je hertentamen, <em>stap voor stap</em></h1>
-      <p>Echte tentamenvragen en eindeloos nieuwe sommen. Bij elke stap zie je meteen of je goed zit, en hoe je het op je tentamen opschrijft.</p>
-      <div style="display:flex;gap:10px;flex-wrap:wrap"><a class="btn primary big" href="wiskunde-a/index.html">Begin met Wiskunde A</a></div>
+      <h1>Oefen voor je CCVX-tentamen, <em>stap voor stap</em></h1>
+      <p>Uitleg per onderwerp en eindeloos nieuwe sommen, gebaseerd op alle voorbeeldtentamens.</p>
+      <div class="hero-cta"><a class="btn primary big" href="login.html" data-app-link>Start met oefenen</a><a class="btn big" href="over.html">Hoe werkt het?</a></div>
     </div>
     <div class="hero-art" aria-hidden="true">
-      <span style="--i:0;--s:#e6f0ff;--c:#2563eb">x³</span>
-      <span style="--i:1;--s:#efe7ff;--c:#7c3aed">2ˣ</span>
-      <span style="--i:2;--s:#e0f7f5;--c:#0d9488">√x</span>
-      <span style="--i:3;--s:#ffe8f1;--c:#db2777">f′</span>
-      <span style="--i:4;--s:#fff0e5;--c:#ea580c">log</span>
-      <span style="--i:5;--s:#fdf6dc;--c:#ca8a04">Σ</span>
+      <span style="--i:0;--s:#e6f0ff;--c:#2563eb">x²</span>
+      <span style="--i:1;--s:#ffe8f1;--c:#db2777">f′</span>
+      <span style="--i:2;--s:#fff4e2;--c:#c26a00">P</span>
+      <span style="--i:3;--s:#efe7ff;--c:#7c3aed">σ</span>
+      <span style="--i:4;--s:#e0f4f9;--c:#0891b2">sin</span>
+      <span style="--i:5;--s:#e0f7f5;--c:#0d9488">gᵗ</span>
     </div>
   </section>
 
   <section>
     <div class="section-h"><h2>Vakken</h2></div>
     <div class="vakken">
-      <a class="card vak" href="wiskunde-a/index.html" style="--i:0">
+      <a class="card vak" href="login.html" data-app-link style="--i:0">
         <span class="tag">Nu beschikbaar</span>
         <h3>Wiskunde A</h3>
-        <p>Alle zes onderdelen van het tentamen, met uitleg per vaardigheid en eindeloos nieuwe oefensommen. Gebouwd op een analyse van alle 24 voorbeeldtentamens.</p>
-        <ul><li>Algebra</li><li>Afgeleide en optimaliseren</li><li>Kansrekening</li><li>Normale verdeling en toetsen</li><li>Periodieke functies</li><li>Groeimodellen</li></ul>
+        <ul><li>Algebra</li><li>Afgeleide</li><li>Kansrekening</li><li>Normale verdeling</li><li>Periodieke functies</li><li>Groeimodellen</li></ul>
       </a>
       <div class="card vak soon" style="--i:1">
         <span class="tag">Binnenkort</span>
-        <h3>Wiskunde B en meer vakken</h3>
-        <p>Wiskunde B en andere vakken komen hier stap voor stap bij.</p>
+        <h3>Wiskunde B</h3>
+        <p>En daarna meer vakken.</p>
       </div>
     </div>
   </section>
 
   <section>
     <div class="section-h"><h2>Zo werkt het</h2></div>
-    <ol class="how" style="margin:0;padding:0">
-      <li><b>Kies wat je wilt oefenen</b><span>Of begin bij wat op het tentamen de meeste punten oplevert.</span></li>
-      <li><b>Leer en oefen</b><span>Elke vaardigheid heeft een korte uitleg en sommen die je in kleine stappen oplost.</span></li>
-      <li><b>Zie wat je al kunt</b><span>Per vaardigheid zie je of je hem beheerst, en wat je nog moet oefenen.</span></li>
+    <ol class="how">
+      <li><b>Log in</b><span>Maak gratis een account. Je voortgang wordt bewaard.</span></li>
+      <li><b>Leer en oefen</b><span>Korte uitleg, daarna sommen in kleine stappen.</span></li>
+      <li><b>Zie wat je kunt</b><span>Per onderwerp zie je of je het beheerst.</span></li>
     </ol>
   </section>
 </main>
-
 <footer class="foot">
   <div class="wrap">
     <span>Oefenlab is een gratis initiatief en is niet verbonden aan CCVX.</span>
-    <span>Zonder account blijft je voortgang op dit apparaat. <a href="privacy.html">Privacy</a></span>
+    <nav class="foot-nav" aria-label="Onderaan"><a href="over.html">Over</a><a href="faq.html">Veelgestelde vragen</a><a href="blog.html">Blog</a><a href="privacy.html">Privacy</a></nav>
   </div>
 </footer>
 <script src="assets/js/config.js"></script>
 <script src="assets/js/progress.js"></script>
 <script src="assets/js/account.js"></script>
-<script>Account.init({ courses: ['wiskunde-a-opgave-1'], root: '' });</script>
+<script src="assets/js/site.js"></script>
 </body>
 </html>

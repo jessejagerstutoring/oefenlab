@@ -116,15 +116,15 @@
   }
   function dots(r) { return `<span class="dots" aria-hidden="true">${[0, 1, 2, 3, 4].map(i => `<i class="${r && i < r.length ? (r[i] ? 'g' : 'f') : ''}"></i>`).join('')}</span>`; }
   function topicCard(t, i) {
-    const pr = t.id === 'mix' ? null : V.topic(t.id), stt = pr ? Voortgang.status(pr) : null, info = examInfo(t.id);
-    const meta = !pr ? `<span>Alle vaardigheden door elkaar</span>`
-      : `<span class="st st-${stt}">${Voortgang.STATUS[stt].teken} ${Voortgang.STATUS[stt].kort}</span>${pr.n ? dots(pr.r) : ''}`;
-    const freq = info ? `<span class="freq">In ${info.tentamens} van ${EA.tentamens} tentamens</span>` : '';
-    const learn = t.id !== 'mix' && skillInfo(t.id) ? `<button type="button" class="topic-learn" data-learn="${t.id}">${ICON.book}Uitleg</button>` : '';
-    return `<div class="card topic" style="--i:${i}">
+    const pr = t.id === 'mix' ? null : V.topic(t.id), stt = pr ? Voortgang.status(pr) : null, info = examInfo(t.id), sk = skillInfo(t.id);
+    const meta = pr ? `<span class="st st-${stt}">${Voortgang.STATUS[stt].teken} ${Voortgang.STATUS[stt].kort}</span>${pr.n ? dots(pr.r) : ''}` : '';
+    const tekst = t.id === 'mix' ? 'Alle onderwerpen door elkaar, net als op het tentamen.' : (sk ? sk.kort : t.blurb || '');
+    const learn = t.id !== 'mix' && sk ? `<button type="button" class="topic-learn" data-learn="${t.id}" aria-label="Uitleg: ${t.title}">${ICON.book}</button>` : '';
+    return `<div class="card topic reveal-card" style="--i:${i};--c:${t.color};--s:${t.soft}">
       <button type="button" class="topic-go" data-topic="${t.id}" aria-label="Oefen ${t.title}">
         <span class="art" style="--s:${t.soft}">${artFor(t)}</span>
-        <b>${t.title}</b>${freq}<span class="meta">${meta}</span></button>${learn}</div>`;
+        <b>${t.title}</b><span class="meta">${meta}</span></button>${learn}
+      <span class="reveal" aria-hidden="true">${tekst}${info ? `<small>In ${info.tentamens} van ${EA.tentamens} tentamens</small>` : ''}</span></div>`;
   }
   function nextTopic() { return C.topics.find(t => Voortgang.status(V.topic(t.id)) !== 'kan') || null; }
   function heroCard() {
@@ -143,7 +143,7 @@
     if (!V.stats.n) return `<div class="card resume" style="--i:1">
         <span class="eyebrow">Nieuw hier? Zo werkt het</span>
         <ol class="steps3"><li><i>1</i>Kies ${C.bank.length ? 'een onderwerp' : 'een vaardigheid'}</li><li><i>2</i>Los de som op in kleine stappen</li><li><i>3</i>Schrijf de uitwerking over, net als op je tentamen</li></ol>
-        <button class="btn primary big" data-topic="${C.topics[0].id}">Begin met de belangrijkste ${ICON.arrow}</button></div>`;
+        <button class="btn primary big" data-topic="${C.topics[0].id}">${C.bank.length ? `Begin met ${C.topics[0].short.toLowerCase()}` : 'Begin met de belangrijkste'} ${ICON.arrow}</button></div>`;
     const t = nextTopic();
     if (!t) return `<div class="card resume" style="--i:1"><span class="eyebrow">Alles onder de knie</span><b style="font-size:18px">Klaar voor het echte werk?</b><span style="color:var(--muted);font-weight:700">Maak een heel voorbeeldtentamen, helemaal zelf.</span><button class="btn primary big" id="b-toexams">Tentamen maken ${ICON.arrow}</button></div>`;
     const pr = V.topic(t.id), stt = Voortgang.status(pr);
@@ -156,7 +156,7 @@
     const el = $('v-home');
     el.innerHTML = `
       <section class="home-hero">
-        <div class="hero-t"><h1>${C.home ? C.home.titel : 'Wat ga je vandaag oefenen?'}</h1><p>${C.home ? C.home.tekst : 'Kies een onderwerp. Je lost elke som op in kleine stappen en ziet meteen of je goed zit.'}</p></div>
+        <div class="hero-t"><h1>${C.home ? C.home.titel : 'Opgave 1: algebra'}</h1><p>${C.home ? C.home.tekst : 'Elke som los je op in kleine stappen.'}</p></div>
         ${heroCard()}
       </section>
       <section>
@@ -690,5 +690,5 @@
   try { if (location.hash) history.replaceState(null, '', location.pathname); } catch (e) {}
   setView('home', false);
   if (deep && topicOf(deep[2])) { deep[1] === 'leer' && skillInfo(deep[2]) ? openLearn(deep[2]) : startPractice({ source: 'new', topic: deep[2] }); }
-  Account.init({ courses: [C.id], root: '../' });
+  Account.init({ courses: [C.id], root: '../', require: true });
 })();

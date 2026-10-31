@@ -270,7 +270,7 @@ function buildMeetkunde({ L, Z, h, D }) {
 
 const COURSE = maakOnderdeel({
   onderdeel: 'opt',
-  home: { titel: 'Afgeleide en optimaliseren', tekst: 'Bijna elk tentamen begint de contextopgaven met dit onderdeel. Het vaakst gevraagd: een maximum of minimum berekenen met de afgeleide.' },
+  home: { titel: 'Afgeleide en optimaliseren', tekst: 'Begin met wat het vaakst gevraagd wordt.' },
   gens: {
     oExtreem: { topic: 'opt-extreem', rand: randExtreem, build: buildExtreem, w: 3 },
     oVergelijking: { topic: 'opt-vergelijking', rand: randVergelijking, build: buildVergelijking, w: 2 },

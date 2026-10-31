@@ -12,7 +12,9 @@ const Account = (() => {
   const cfg = window.OEFENLAB_CONFIG || {};
   const configured = !!(cfg.supabaseUrl && cfg.supabaseAnonKey);
   const SUPABASE_JS = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3/dist/umd/supabase.js';
-  let sb = null, user = null, profile = null, courses = [], root = '', ready = false;
+  let sb = null, user = null, profile = null, courses = [], root = '', ready = false, opts0 = {};
+  const nextUrl = () => new URLSearchParams(location.search).get('next') || `${root}wiskunde-a/index.html`;
+  const toLogin = () => { location.replace(`${root}login.html?next=${encodeURIComponent(location.pathname + location.hash)}`); };
   const listeners = new Set();
   const $ = id => document.getElementById(id);
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -50,10 +52,13 @@ const Account = (() => {
       try { await Voortgang.koppel(adapter, courses); } catch (e) { console.warn('Voortgang ophalen mislukt', e); }
     }
     ready = true;
+    if (opts0.require && !user) return toLogin();
+    if (opts0.page && user) return location.replace(nextUrl());
     render(); emit();
   }
 
   async function init(opts = {}) {
+    opts0 = opts;
     courses = opts.courses || [];
     root = opts.root || '';
     buildDialog();
@@ -78,8 +83,8 @@ const Account = (() => {
     if (!slot) return;
     if (!configured || !ready) { slot.innerHTML = ''; return; }
     if (!user) {
-      slot.innerHTML = `<button class="btn" id="acc-open">Inloggen</button>`;
-      $('acc-open').onclick = () => open('login');
+      if (opts0.page) { slot.innerHTML = ''; return; }
+      slot.innerHTML = `<a class="btn primary" id="acc-open" href="${root}login.html">Inloggen</a>`;
       return;
     }
     const name = (profile && profile.display_name) || user.email;
@@ -88,6 +93,8 @@ const Account = (() => {
         <button class="btn acc-btn" id="acc-menu-btn" aria-haspopup="true" aria-expanded="false"><span class="avatar" aria-hidden="true">${esc(name.trim().charAt(0).toUpperCase() || '?')}</span><span class="lbl">${esc(name.split(' ')[0])}</span></button>
         <div class="acc-menu" id="acc-menu" hidden>
           <div class="acc-who"><b>${esc(name)}</b><span>${esc(user.email)}</span></div>
+          <a class="acc-item" href="${root}wiskunde-a/index.html">Oefenen</a>
+          <a class="acc-item" href="${root}wiskunde-a/voortgang.html">Mijn voortgang</a>
           ${profile && profile.role === 'begeleider' ? `<a class="acc-item" href="${root}begeleider.html">Overzicht leerlingen</a>` : ''}
           <button class="acc-item" id="acc-logout">Uitloggen</button>
         </div>
@@ -105,16 +112,15 @@ const Account = (() => {
     await Voortgang.ontkoppel();
     await sb.auth.signOut();
     user = null; profile = null;
-    render(); emit();
+    location.href = `${root}index.html`;
   }
 
   /* ---------- inlogvenster ---------- */
   let mode = 'login';
   function buildDialog() {
-    if ($('acc-dlg') || !configured) return;
-    document.body.insertAdjacentHTML('beforeend', `
-      <dialog id="acc-dlg" class="acc-dlg" aria-labelledby="acc-h">
-        <div class="dlg-h"><h2 id="acc-h">Inloggen</h2><button class="btn iconbtn" id="acc-close" aria-label="Sluiten"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>
+    if ($('acc-form') || !configured) return;
+    const page = $('login-page');
+    const form = `
         <form class="acc-form" id="acc-form" novalidate>
           <div class="seg" id="acc-tabs" role="radiogroup" aria-label="Inloggen of account maken">
             <button type="button" role="radio" data-m="login">Inloggen</button><button type="button" role="radio" data-m="signup">Account maken</button>
@@ -126,14 +132,19 @@ const Account = (() => {
           <button class="btn primary big" type="submit" id="acc-submit">Inloggen</button>
           <button class="linkbtn" type="button" id="acc-forgot">Wachtwoord vergeten?</button>
           <p class="note" id="acc-why">Met een account wordt je voortgang bewaard, ook op een andere computer of je telefoon. We bewaren alleen je voornaam, je e-mailadres en je voortgang. Je begeleider kan je voortgang zien. <a href="${root}privacy.html" target="_blank" rel="noopener">Lees meer over privacy</a>.</p>
-        </form>
-      </dialog>`);
-    $('acc-close').onclick = () => $('acc-dlg').close();
-    $('acc-dlg').addEventListener('click', e => { if (e.target === $('acc-dlg')) $('acc-dlg').close(); });
+        </form>`;
+    if (page) page.innerHTML = `<h1 id="acc-h">Inloggen</h1>${form}`;
+    else {
+      document.body.insertAdjacentHTML('beforeend', `<dialog id="acc-dlg" class="acc-dlg" aria-labelledby="acc-h"><div class="dlg-h"><h2 id="acc-h">Inloggen</h2><button class="btn iconbtn" id="acc-close" aria-label="Sluiten"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>${form}</dialog>`);
+      $('acc-close').onclick = () => done();
+      $('acc-dlg').addEventListener('click', e => { if (e.target === $('acc-dlg')) done(); });
+    }
     $('acc-tabs').querySelectorAll('button').forEach(b => b.onclick = () => setMode(b.dataset.m));
     $('acc-forgot').onclick = () => setMode('forgot');
     $('acc-form').onsubmit = e => { e.preventDefault(); submit(); };
+    if (page) setMode(new URLSearchParams(location.search).get('mode') === 'signup' ? 'signup' : 'login');
   }
+  function done() { if ($('acc-dlg')) $('acc-dlg').close(); }
   function setMode(m) {
     mode = m;
     const titles = { login: 'Inloggen', signup: 'Account maken', forgot: 'Wachtwoord vergeten', reset: 'Nieuw wachtwoord' };
@@ -152,9 +163,9 @@ const Account = (() => {
     msg('');
   }
   function open(m) {
-    if (!$('acc-dlg')) return;
+    if (!$('acc-form')) return;
     setMode(m);
-    if (!$('acc-dlg').open) $('acc-dlg').showModal();
+    if ($('acc-dlg') && !$('acc-dlg').open) $('acc-dlg').showModal();
     (m === 'signup' ? $('acc-name') : m === 'reset' ? $('acc-pw') : $('acc-email')).focus();
   }
   function msg(text, ok) { const el = $('acc-msg'); el.textContent = text; el.className = 'acc-msg' + (ok ? ' ok' : ''); }
@@ -179,11 +190,11 @@ const Account = (() => {
       if (mode === 'login') {
         const { error } = await sb.auth.signInWithPassword({ email, password: pw });
         if (error) throw error;
-        $('acc-dlg').close();
+        done();
       } else if (mode === 'signup') {
         const { data, error } = await sb.auth.signUp({ email, password: pw, options: { data: { display_name: name }, emailRedirectTo: here() } });
         if (error) throw error;
-        if (data.session) $('acc-dlg').close();
+        if (data.session) done();
         else msg('Gelukt! We hebben je een mail gestuurd. Klik op de link in die mail om je account te bevestigen.', true);
       } else if (mode === 'forgot') {
         const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: here() });
@@ -193,7 +204,7 @@ const Account = (() => {
         const { error } = await sb.auth.updateUser({ password: pw });
         if (error) throw error;
         msg('Je nieuwe wachtwoord is opgeslagen.', true);
-        setTimeout(() => $('acc-dlg').close(), 1200);
+        setTimeout(done, 1200);
       }
     } catch (e) { msg(nice(e)); }
     btn.disabled = false;

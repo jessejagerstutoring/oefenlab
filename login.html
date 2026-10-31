@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Inloggen · Oefenlab</title>
+<meta name="description" content="Log in om te oefenen.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@500;600;700;800&display=swap">
+<link rel="stylesheet" href="assets/css/app.css">
+</head>
+<body class="site login">
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="index.html"><span class="logo" aria-hidden="true">O</span><span class="brand-t"><b>Oefenlab</b></span></a>
+    <nav class="site-nav" id="site-nav" aria-label="Hoofdmenu">
+      <a href="over.html">Over Oefenlab</a>
+      <a href="faq.html">Veelgestelde vragen</a>
+      <a href="blog.html">Blog</a>
+    </nav>
+    <div class="top-act">
+      <div class="lang">
+        <button class="btn ghost lang-btn" id="lang-btn" aria-haspopup="true" aria-expanded="false" aria-label="Taal kiezen">NL <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+        <div class="lang-menu" id="lang-menu" hidden>
+          <button type="button" data-lang="nl" aria-current="true">Nederlands</button>
+          <button type="button" data-lang="en">English <small>binnenkort</small></button>
+        </div>
+      </div>
+      <div id="account-slot"></div>
+      <button class="btn iconbtn ghost nav-toggle" id="nav-toggle" aria-label="Menu" aria-expanded="false" aria-controls="site-nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+    </div>
+  </div>
+  <p class="lang-note" id="lang-note" role="status" hidden>The English version is coming soon.</p>
+</header>
+
+<main class="wrap login-main">
+  <section class="login-card card" id="login-page" aria-live="polite"><p class="note">Even laden…</p></section>
+  <aside class="login-side">
+    <b>Gratis oefenen voor je CCVX-tentamen</b>
+    <ul>
+      <li>Uitleg per onderwerp</li>
+      <li>Eindeloos nieuwe sommen</li>
+      <li>Je voortgang op elk apparaat</li>
+    </ul>
+  </aside>
+</main>
+<footer class="foot">
+  <div class="wrap">
+    <span>Oefenlab is een gratis initiatief en is niet verbonden aan CCVX.</span>
+    <nav class="foot-nav" aria-label="Onderaan"><a href="over.html">Over</a><a href="faq.html">Veelgestelde vragen</a><a href="blog.html">Blog</a><a href="privacy.html">Privacy</a></nav>
+  </div>
+</footer>
+<script src="assets/js/config.js"></script>
+<script src="assets/js/progress.js"></script>
+<script src="assets/js/account.js"></script>
+<script src="assets/js/site.js"></script>
+</body>
+</html>

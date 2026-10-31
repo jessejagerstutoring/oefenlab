@@ -27,67 +27,54 @@
     const el = $('vak'), totaal = VAK.onderdelen.reduce((s, o) => s + skills(o).length, 0);
     const kan = VAK.onderdelen.reduce((s, o) => s + skills(o).filter(x => stOf(o, x.id) === 'kan').length, 0);
     const geoefend = VAK.onderdelen.some(o => skills(o).some(x => rec(o, x.id).n));
-    const tips = aanraders(3);
+    const naam = Account.profile && Account.profile.display_name ? Account.profile.display_name.split(' ')[0] : '';
     const ring = 2 * Math.PI * 40, deel = ring * kan / totaal;
     el.innerHTML = `
-      <section class="home-hero">
-        <div class="hero-t">
-          <span class="eyebrow">${VAK.examen}</span>
+      <section class="hub-head">
+        <div>
+          <span class="eyebrow">${naam ? `Hoi ${Account.esc(naam)}` : 'Welkom'}</span>
           <h1>${VAK.titel}</h1>
-          <p>Het tentamen bestaat altijd uit dezelfde zes onderdelen. Opgave 1 is algebra, daarna volgen vijf contextopgaven in wisselende volgorde. Oefen per vaardigheid, of begin bij wat het meeste punten oplevert.</p>
+          <p class="hub-sub">Kies een onderdeel om te oefenen.</p>
         </div>
-        <a class="card resume ring-card" href="voortgang.html" style="--i:1">
-          <svg width="96" height="96" viewBox="0 0 96 96" role="img" aria-label="${kan} van ${totaal} vaardigheden onder de knie"><circle cx="48" cy="48" r="40" fill="none" stroke="#e4e6ee" stroke-width="10"/><circle cx="48" cy="48" r="40" fill="none" stroke="#1f9d55" stroke-width="10" stroke-linecap="round" stroke-dasharray="${deel.toFixed(1)} ${ring.toFixed(1)}" transform="rotate(-90 48 48)"/><text x="48" y="54" text-anchor="middle" font-family="Fredoka, sans-serif" font-weight="700" font-size="20" fill="#1b1d2a">${kan}/${totaal}</text></svg>
-          <span><span class="eyebrow">Mijn voortgang</span><b>${kan} van ${totaal} vaardigheden onder de knie</b><span class="sub">Bekijk per vaardigheid wat je al kunt</span></span>
+        <a class="card ring-card" href="voortgang.html" style="--i:1" aria-label="Mijn voortgang: ${kan} van ${totaal} onderwerpen onder de knie">
+          <svg width="80" height="80" viewBox="0 0 96 96" aria-hidden="true"><circle cx="48" cy="48" r="40" fill="none" stroke="#e4e6ee" stroke-width="10"/><circle cx="48" cy="48" r="40" fill="none" stroke="#1f9d55" stroke-width="10" stroke-linecap="round" stroke-dasharray="${deel.toFixed(1)} ${ring.toFixed(1)}" transform="rotate(-90 48 48)"/><text x="48" y="54" text-anchor="middle" font-family="Fredoka, sans-serif" font-weight="700" font-size="20" fill="#1b1d2a">${kan}/${totaal}</text></svg>
+          <span><b>Mijn voortgang</b><span class="sub">onderwerpen onder de knie</span></span>
         </a>
       </section>
 
+      <section class="onderdelen">${VAK.onderdelen.map((o, i) => {
+        const sk = skills(o), k = sk.filter(x => stOf(o, x.id) === 'kan').length, info = EXAMENANALYSE.onderdelen[o.id] || {};
+        return `<a class="card onderdeel reveal-card${o.id === 'algebra' ? ' first' : ''}" href="${o.pagina}" style="--i:${i};--c:${o.kleur};--s:${o.zacht}">
+          ${o.id === 'algebra' ? '<span class="ribbon">Start hier</span>' : ''}
+          <span class="od-sym">${o.symbool}</span>
+          <b>${o.titel}</b>
+          <span class="meta"><span class="bar" style="--c:${o.kleur}"><i style="--w:${k / sk.length * 100}%"></i></span><span>${k}/${sk.length}</span></span>
+          <span class="reveal" aria-hidden="true">${o.blurb}<small>In ${info.tentamens || 0} van ${EXAMENANALYSE.tentamens} tentamens${o.id !== 'algebra' && info.gemPunten ? ` · ± ${Math.round(info.gemPunten)} punten` : ''}</small></span>
+        </a>`;
+      }).join('')}</section>
+
       <section>
-        <div class="section-h"><h2>${geoefend ? 'Werk hier eerst aan' : 'Begin hier'}</h2><span class="note">${geoefend ? 'Wat op het tentamen veel punten oplevert en wat je nog niet beheerst.' : 'De vaardigheden die op het tentamen de meeste punten opleveren.'}</span></div>
-        <div class="tips">${tips.map((x, i) => `
+        <div class="section-h"><h2>${geoefend ? 'Werk hier eerst aan' : 'Levert de meeste punten op'}</h2></div>
+        <div class="tips">${aanraders(3).map((x, i) => `
           <div class="card tip-card" style="--i:${i};--c:${x.o.kleur};--s:${x.o.zacht}">
             <span class="eyebrow" style="color:${x.o.kleur}">${x.o.titel}</span>
             <b>${x.s.titel}</b>
-            <span class="tip-meta"><span class="st st-${x.st}">${S[x.st].teken} ${S[x.st].kort}</span><span>In ${exam(x.s.id).tentamens} van ${EXAMENANALYSE.tentamens} tentamens</span></span>
-            <span class="tip-act"><a class="btn primary" href="${x.o.pagina}#oefen-${x.s.id}">Oefen ${arrow}</a><a class="btn" href="${x.o.pagina}#leer-${x.s.id}">Uitleg</a></span>
+            <span class="tip-act"><a class="btn primary" href="${x.o.pagina}#oefen-${x.s.id}">Oefen ${arrow}</a><a class="btn" href="${x.o.pagina}#leer-${x.s.id}">Uitleg</a><span class="st st-${x.st}">${S[x.st].teken} ${S[x.st].kort}</span></span>
           </div>`).join('')}</div>
-      </section>
-
-      <section>
-        <div class="section-h"><h2>De zes onderdelen</h2></div>
-        <div class="onderdelen">${VAK.onderdelen.map((o, i) => {
-          const sk = skills(o), k = sk.filter(x => stOf(o, x.id) === 'kan').length, info = EXAMENANALYSE.onderdelen[o.id] || {};
-          return `<a class="card onderdeel" href="${o.pagina}" style="--i:${i}">
-            <span class="od-top"><span class="od-sym" style="background:${o.zacht};color:${o.kleur}">${o.symbool}</span><span><span class="eyebrow" style="color:${o.kleur}">${o.sub}</span><b>${o.titel}</b></span></span>
-            <span class="od-blurb">${o.blurb}</span>
-            <span class="od-chips"><span>In ${info.tentamens || 0} van ${EXAMENANALYSE.tentamens} tentamens</span>${o.id !== 'algebra' && info.gemPunten ? `<span>± ${Math.round(info.gemPunten)} punten</span>` : ''}</span>
-            <span class="meta"><span class="bar" style="--c:${o.kleur}"><i style="--w:${k / sk.length * 100}%"></i></span><span>${k}/${sk.length} vaardigheden</span></span>
-          </a>`;
-        }).join('')}</div>
-      </section>
-
-      <section class="exam-info">
-        <h2>Zo is het tentamen opgebouwd</h2>
-        <ul>
-          <li><b>3 uur, 5 of 6 opgaven.</b> Opgave 1 is altijd algebra zonder verhaal. Daarna komen contextopgaven: een verhaal met een formule, grafiek of tabel.</li>
-          <li><b>Alles algebraïsch.</b> Je mag alleen een gewone rekenmachine gebruiken, geen grafische. Laat elke stap zien.</li>
-          <li><b>Formulelijst.</b> Achterin staan de abc-formule, de afgeleiden, de log-regels, de somformules en de toetsgrenzen. Je hoeft die niet uit je hoofd te kennen, wel te weten wanneer je ze gebruikt.</li>
-        </ul>
-        <p class="note">De onderdelen en tellingen komen uit een analyse van alle ${EXAMENANALYSE.tentamens} voorbeeldtentamens van CCVX.</p>
       </section>`;
   }
 
   function renderVoortgang() {
     const el = $('voortgang');
     el.innerHTML = `
-      <section class="section-h" style="margin:0"><div><h1 class="vg-h">Mijn voortgang</h1><p class="note" style="margin-top:6px">Per vaardigheid zie je hoe je laatste vijf pogingen gingen.</p></div>
+      <section class="section-h" style="margin:0"><div><h1 class="vg-h">Mijn voortgang</h1></div>
         <div class="legend-st">${['kan', 'bijna', 'lastig', 'nieuw'].map(k => `<span class="st st-${k}">${S[k].teken} ${S[k].label}</span>`).join('')}</div></section>
       ${VAK.onderdelen.map(o => {
         const sk = skills(o).sort((a, b) => gewicht(b.id) - gewicht(a.id)), k = sk.filter(x => stOf(o, x.id) === 'kan').length;
         return `<section class="vg-block">
           <div class="vg-head"><b><span style="color:${o.kleur}">●</span> ${o.titel}</b><span>${k} / ${sk.length}</span><a href="${o.pagina}">Naar dit onderdeel</a></div>
           <ul class="vg-list">${sk.map(s => { const r = rec(o, s.id), st = stOf(o, s.id); return `
-            <li><span class="st st-${st}">${S[st].teken} ${S[st].kort}</span>${r.n ? dots(r.r) : ''}<span class="vg-name">${s.titel}<small>In ${exam(s.id).tentamens} van ${EXAMENANALYSE.tentamens} tentamens${r.n ? ` · ${r.n} keer geoefend` : ''}</small></span>
+            <li><span class="st st-${st}">${S[st].teken} ${S[st].kort}</span>${r.n ? dots(r.r) : ''}<span class="vg-name">${s.titel}</span>
               <span class="vg-act"><a href="${o.pagina}#leer-${s.id}">Uitleg</a><a href="${o.pagina}#oefen-${s.id}">Oefen</a></span></li>`; }).join('')}</ul>
         </section>`;
       }).join('')}`;
@@ -95,6 +82,7 @@
 
   const render = () => { if ($('vak')) renderVak(); if ($('voortgang')) renderVoortgang(); };
   Voortgang.onChange(render);
+  Account.onChange(render);
   render();
-  Account.init({ courses: VAK.onderdelen.map(courseId), root: '../' });
+  Account.init({ courses: VAK.onderdelen.map(courseId), root: '../', require: true });
 })();

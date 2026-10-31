@@ -143,7 +143,7 @@ function buildTellen({ vorm, n, k }) {
 
 const COURSE = maakOnderdeel({
   onderdeel: 'kans',
-  home: { titel: 'Kansrekening en tellen', tekst: 'Een kansopgave staat in vrijwel elk tentamen en is gemiddeld het meeste punten waard. Oefen vooral de kansboom, de binomiale kans en de verwachte winst.' },
+  home: { titel: 'Kansrekening en tellen', tekst: 'Begin met wat het vaakst gevraagd wordt.' },
   gens: {
     kBoom: { topic: 'kans-boom', rand: randBoom, build: buildBoom, w: 2.5 },
     kVerwacht: { topic: 'kans-verwachting', rand: randVerwacht, build: buildVerwacht, w: 2 },

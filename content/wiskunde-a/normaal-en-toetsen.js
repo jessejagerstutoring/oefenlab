@@ -229,7 +229,7 @@ function buildConclusie({ c, m, sd, n, a, x }) {
 
 const COURSE = maakOnderdeel({
   onderdeel: 'normaal',
-  home: { titel: 'Normale verdeling en toetsen', tekst: 'Dit onderdeel levert gemiddeld de meeste punten op. Hypothesen opstellen en een conclusie trekken komen in vrijwel elk tentamen terug: die stappen zijn altijd hetzelfde.' },
+  home: { titel: 'Normale verdeling en toetsen', tekst: 'Begin met wat het vaakst gevraagd wordt.' },
   gens: {
     tConclusie: { topic: 'toets-conclusie', rand: randConclusie, build: buildConclusie, w: 2.5 },
     tHyp: { topic: 'toets-hyp', rand: randHyp, build: buildHyp, w: 1.5 },

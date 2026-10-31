@@ -249,7 +249,7 @@ function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
 
 const COURSE = maakOnderdeel({
   onderdeel: 'groei',
-  home: { titel: 'Groeimodellen', tekst: 'Groeimodellen komen in vrijwel elk tentamen voor, goed voor zo\'n 14 punten. Begin met de vaardigheid die het vaakst gevraagd wordt: een tijdstip berekenen met de log.' },
+  home: { titel: 'Groeimodellen', tekst: 'Begin met wat het vaakst gevraagd wordt.' },
   gens: {
     gTijdstip: { topic: 'groei-tijdstip', rand: randTijdstip, build: buildTijdstip, w: 3 },
     gFactor: { topic: 'groei-factor', rand: randGFactor, build: buildGFactor, w: 2 },
