@@ -11,7 +11,7 @@
 const Account = (() => {
   const cfg = window.OEFENLAB_CONFIG || {};
   const configured = !!(cfg.supabaseUrl && cfg.supabaseAnonKey);
-  const SUPABASE_JS = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js';
+  const SUPABASE_JS = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3/dist/umd/supabase.js';
   let sb = null, user = null, profile = null, courses = [], root = '', ready = false;
   const listeners = new Set();
   const $ = id => document.getElementById(id);
