@@ -95,6 +95,7 @@ const Account = (() => {
           <div class="acc-who"><b>${esc(name)}</b><span>${esc(user.email)}</span></div>
           <a class="acc-item" href="${root}wiskunde-a/index.html">Oefenen</a>
           <a class="acc-item" href="${root}wiskunde-a/voortgang.html">Mijn voortgang</a>
+          <a class="acc-item" href="${root}wiskunde-a/naslag.html">Naslag</a>
           ${profile && profile.role === 'begeleider' ? `<a class="acc-item" href="${root}begeleider.html">Overzicht leerlingen</a>` : ''}
           <button class="acc-item" id="acc-logout">Uitloggen</button>
         </div>

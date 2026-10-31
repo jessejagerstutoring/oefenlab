@@ -9,7 +9,7 @@ import vm from 'node:vm';
 
 const dir = new URL('../content/', import.meta.url);
 const read = p => readFileSync(new URL(p, dir), 'utf8');
-const SKIP = new Set(['vak.js', 'examenanalyse.js', 'opgave-1.js']);
+const SKIP = new Set(['vak.js', 'examenanalyse.js', 'opgave-1.js', 'naslag.js']);
 const files = readdirSync(new URL('wiskunde-a/', dir)).filter(f => f.endsWith('.js') && !SKIP.has(f));
 const SAMPLES = 150;
 let total = 0, failed = 0;

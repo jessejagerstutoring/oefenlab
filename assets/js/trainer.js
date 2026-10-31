@@ -118,13 +118,13 @@
   function topicCard(t, i) {
     const pr = t.id === 'mix' ? null : V.topic(t.id), stt = pr ? Voortgang.status(pr) : null, info = examInfo(t.id), sk = skillInfo(t.id);
     const meta = pr ? `<span class="st st-${stt}">${Voortgang.STATUS[stt].teken} ${Voortgang.STATUS[stt].kort}</span>${pr.n ? dots(pr.r) : ''}` : '';
-    const tekst = t.id === 'mix' ? 'Alle onderwerpen door elkaar, net als op het tentamen.' : (sk ? sk.kort : t.blurb || '');
+    const tekst = t.id === 'mix' ? 'Alles door elkaar, net als op het tentamen.' : (sk ? sk.hover : t.blurb || '');
     const learn = t.id !== 'mix' && sk ? `<button type="button" class="topic-learn" data-learn="${t.id}" aria-label="Uitleg: ${t.title}">${ICON.book}</button>` : '';
     return `<div class="card topic reveal-card" style="--i:${i};--c:${t.color};--s:${t.soft}">
       <button type="button" class="topic-go" data-topic="${t.id}" aria-label="Oefen ${t.title}">
         <span class="art" style="--s:${t.soft}">${artFor(t)}</span>
         <b>${t.title}</b><span class="meta">${meta}</span></button>${learn}
-      <span class="reveal" aria-hidden="true">${tekst}${info ? `<small>In ${info.tentamens} van ${EA.tentamens} tentamens</small>` : ''}</span></div>`;
+      <span class="reveal" aria-hidden="true"><span>${tekst}</span>${info ? `<small>In ${info.tentamens} van de ${EA.tentamens} tentamens</small>` : ''}</span></div>`;
   }
   function nextTopic() { return C.topics.find(t => Voortgang.status(V.topic(t.id)) !== 'kan') || null; }
   function heroCard() {
@@ -219,7 +219,7 @@
           ${v.voorbeeld.regels.length > 1 ? `<button class="btn" id="l-more">Volgende regel ${ICON.arrow}</button>` : ''}</section>
         <section class="lcard lwarn"><h2>Let op</h2><p>${v.valkuil}</p></section>
       </div>
-      <div class="learn-act">${t ? `<button class="btn primary big" id="l-go">Oefen deze vaardigheid ${ICON.arrow}</button>` : ''}</div>`;
+      <div class="learn-act">${t ? `<button class="btn primary big" id="l-go">Oefen deze vaardigheid ${ICON.arrow}</button>` : ''}<a class="btn big" href="naslag.html#${id}">${ICON.book}Lees alles over dit onderwerp</a></div>`;
     $('l-back').onclick = () => $('h-close').onclick();
     if ($('l-go')) $('l-go').onclick = () => startPractice({ source: 'new', topic: id });
     if ($('l-more')) $('l-more').onclick = () => {

@@ -49,7 +49,7 @@
           <span class="od-sym">${o.symbool}</span>
           <b>${o.titel}</b>
           <span class="meta"><span class="bar" style="--c:${o.kleur}"><i style="--w:${k / sk.length * 100}%"></i></span><span>${k}/${sk.length}</span></span>
-          <span class="reveal" aria-hidden="true">${o.blurb}<small>In ${info.tentamens || 0} van ${EXAMENANALYSE.tentamens} tentamens${o.id !== 'algebra' && info.gemPunten ? ` · ± ${Math.round(info.gemPunten)} punten` : ''}</small></span>
+          <span class="reveal" aria-hidden="true"><span>${o.blurb}</span><small>In ${info.tentamens || 0} van de ${EXAMENANALYSE.tentamens} tentamens${o.id !== 'algebra' && info.gemPunten ? ` · ongeveer ${Math.round(info.gemPunten)} punten` : ''}</small></span>
         </a>`;
       }).join('')}</section>
 
