@@ -192,7 +192,9 @@
     if (o.source === 'exam') startExam(o.examN); else newProblem();
   }
   function resume() {
-    const r = V.resume;
+    try { resumeFrom(V.resume); } catch (e) { V.setResume(null); newProblem(); }
+  }
+  function resumeFrom(r) {
     Object.assign(st, { source: r.source, topic: r.topic, level: r.level, mode: r.mode });
     setView('practice');
     if (r.exam) st.exam = { n: r.exam.n, items: examItems(r.exam.n), idx: r.exam.idx, res: r.exam.res };
@@ -627,6 +629,12 @@
   $('plans').addEventListener('click', e => { if (e.target === $('plans')) $('plans').close(); });
 
   /* ---------- start ---------- */
+  // na inloggen of uitloggen kan de voortgang veranderen: menu en tellers opnieuw tonen
+  Voortgang.onChange(() => {
+    st.level = V.prefs.level || st.level; st.mode = V.prefs.mode || st.mode;
+    if (st.view === 'home') renderHome(); else if (st.view === 'exams') renderExams(); else if (st.prob) renderStats();
+  });
   try { if (location.hash) history.replaceState(null, '', location.pathname); } catch (e) {}
   setView('home', false);
+  Account.init({ courses: [C.id], root: '../' });
 })();

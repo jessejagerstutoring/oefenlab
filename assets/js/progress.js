@@ -1,9 +1,9 @@
 /*
  * Voortgang van de leerling.
  *
- * Alles wat we over een leerling bewaren, gaat via dit ene bestand. Nu staat het in de
- * browser (localStorage), dus per apparaat. Komen er later accounts, dan hoeft alleen dit
- * bestand te veranderen: de rest van de site gebruikt alleen Voortgang.cursus(id).
+ * Alles wat we over een leerling bewaren, gaat via dit ene bestand. Het staat altijd in de
+ * browser (localStorage). Is de leerling ingelogd, dan koppelt account.js er een account aan:
+ * dan komt de voortgang uit het account en gaat elke wijziging daar ook naartoe.
  *
  * Opslag, per cursus:
  *   stats    { n: gemaakt, c: zonder hulp, s: op rij }
@@ -15,10 +15,15 @@
 const Voortgang = (() => {
   const KEY = 'oefenlab:v1';
   const empty = () => ({ v: 1, courses: {} });
+  const listeners = new Set();
   let data = empty();
+  let remote = null;          // { load(id), save(id, obj) } zolang er iemand is ingelogd
+  const dirty = new Set();
+  let timer = null;
 
   const read = () => { try { return JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { return null; } };
   const write = () => { try { localStorage.setItem(KEY, JSON.stringify(data)); } catch (e) {} };
+  const emit = () => listeners.forEach(fn => { try { fn(); } catch (e) {} });
 
   data = read() || empty();
 
@@ -30,34 +35,76 @@ const Voortgang = (() => {
     } catch (e) {}
   }
 
+  const blank = () => ({ stats: { n: 0, c: 0, s: 0 }, topics: {}, exams: {}, prefs: {}, resume: null });
+  const course = id => (data.courses[id] = Object.assign(blank(), data.courses[id]));
+  const hasProgress = c => !!(c && c.stats && c.stats.n);
+
+  function changed(id) {
+    write();
+    if (!remote) return;
+    dirty.add(id);
+    clearTimeout(timer);
+    timer = setTimeout(flush, 800);
+  }
+  async function flush() {
+    clearTimeout(timer);
+    if (!remote) return;
+    for (const id of [...dirty]) {
+      dirty.delete(id);
+      try { await remote.save(id, data.courses[id]); } catch (e) { dirty.add(id); }
+    }
+  }
+  addEventListener('pagehide', flush);
+  addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') flush(); });
+
   function cursus(id) {
-    const c = data.courses[id] = Object.assign({ stats: { n: 0, c: 0, s: 0 }, topics: {}, exams: {}, prefs: {}, resume: null }, data.courses[id]);
     return {
-      get stats() { return c.stats; },
-      get prefs() { return c.prefs; },
-      get resume() { return c.resume; },
-      topic: id => c.topics[id] || { n: 0, c: 0, at: 0 },
-      exam: n => c.exams[n] || null,
+      get stats() { return course(id).stats; },
+      get prefs() { return course(id).prefs; },
+      get resume() { return course(id).resume; },
+      topic: t => course(id).topics[t] || { n: 0, c: 0, at: 0 },
+      exam: n => course(id).exams[n] || null,
 
       /* een som is af: clean = zonder hulp */
       finish(topicId, clean) {
+        const c = course(id);
         c.stats.n++;
         if (clean) { c.stats.c++; c.stats.s++; } else c.stats.s = 0;
         if (topicId) {
           const t = c.topics[topicId] = c.topics[topicId] || { n: 0, c: 0, at: 0 };
           t.n++; if (clean) t.c++; t.at = Date.now();
         }
-        write();
+        changed(id);
       },
       examDone(n, got, tot) {
-        const prev = c.exams[n];
+        const c = course(id), prev = c.exams[n];
         c.exams[n] = { best: Math.max(got, prev ? prev.best : 0), tot, at: Date.now() };
-        write();
+        changed(id);
       },
-      setPrefs(p) { Object.assign(c.prefs, p); write(); },
-      setResume(r) { c.resume = r; write(); },
+      setPrefs(p) { Object.assign(course(id).prefs, p); changed(id); },
+      setResume(r) { course(id).resume = r; changed(id); },
     };
   }
 
-  return { cursus };
+  /* Inloggen: de voortgang uit het account wordt leidend. Heeft het account nog niets,
+     dan nemen we mee wat de leerling op dit apparaat al had geoefend. */
+  async function koppel(adapter, ids) {
+    remote = adapter;
+    for (const id of ids) {
+      const theirs = await adapter.load(id);
+      if (hasProgress(theirs) || (theirs && !hasProgress(data.courses[id]))) data.courses[id] = Object.assign(blank(), theirs);
+      else if (hasProgress(data.courses[id])) { dirty.add(id); }
+    }
+    write(); emit();
+    await flush();
+  }
+  /* Uitloggen: alles van dit apparaat wissen, zodat de volgende leerling op deze computer
+     niet verder gaat met de voortgang van de vorige. */
+  async function ontkoppel() {
+    await flush();
+    remote = null; dirty.clear();
+    data = empty(); write(); emit();
+  }
+
+  return { cursus, koppel, ontkoppel, flush, onChange: fn => listeners.add(fn) };
 })();

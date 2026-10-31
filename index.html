@@ -17,14 +17,14 @@
       <span class="logo" aria-hidden="true">O</span>
       <span class="brand-t"><b>Oefenlab</b><small>Gratis oefenen voor je CCVX-tentamen</small></span>
     </a>
-    <a class="btn" href="wiskunde-a/opgave-1.html">Naar de trainer</a>
+    <div class="top-act"><a class="btn hide-sm" href="wiskunde-a/opgave-1.html">Naar de trainer</a><div id="account-slot"></div></div>
   </div>
 </header>
 
 <main class="wrap">
   <section class="hero">
     <div class="hero-t">
-      <span class="eyebrow">Gratis · zonder account</span>
+      <span class="eyebrow">Gratis voor iedereen</span>
       <h1>Oefen voor je hertentamen, <em>stap voor stap</em></h1>
       <p>Echte tentamenvragen en eindeloos nieuwe sommen. Bij elke stap zie je meteen of je goed zit, en hoe je het op je tentamen opschrijft.</p>
       <div style="display:flex;gap:10px;flex-wrap:wrap"><a class="btn primary big" href="wiskunde-a/opgave-1.html">Begin met Wiskunde A</a></div>
@@ -69,8 +69,12 @@
 <footer class="foot">
   <div class="wrap">
     <span>Oefenlab is een gratis initiatief en is niet verbonden aan CCVX.</span>
-    <span>Je voortgang blijft op dit apparaat.</span>
+    <span>Zonder account blijft je voortgang op dit apparaat.</span>
   </div>
 </footer>
+<script src="assets/js/config.js"></script>
+<script src="assets/js/progress.js"></script>
+<script src="assets/js/account.js"></script>
+<script>Account.init({ courses: ['wiskunde-a-opgave-1'], root: '' });</script>
 </body>
 </html>
