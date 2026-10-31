@@ -1,5 +1,5 @@
 /*
- * Wiskunde A · Kansrekening en tellen
+ * Wiskunde A · Kansrekening en combinatoriek
  * Contexten zoals op het tentamen: dobbelstenen, spellen, trekken uit een zak,
  * een vaste kans per stuk (binomiaal) en de verwachte winst van een spel.
  */
@@ -143,7 +143,7 @@ function buildTellen({ vorm, n, k }) {
 
 const COURSE = maakOnderdeel({
   onderdeel: 'kans',
-  home: { titel: 'Kansrekening en tellen', tekst: 'Begin met wat het vaakst gevraagd wordt.' },
+  home: { titel: 'Kansrekening en combinatoriek', tekst: 'Begin met wat het vaakst gevraagd wordt.' },
   gens: {
     kBoom: { topic: 'kans-boom', rand: randBoom, build: buildBoom, w: 2.5 },
     kVerwacht: { topic: 'kans-verwachting', rand: randVerwacht, build: buildVerwacht, w: 2 },

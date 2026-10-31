@@ -41,18 +41,8 @@
     flame: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2c1 4 6 6 6 12a6 6 0 0 1-12 0c0-3 2-5 3-6 0 2 1 3 2 3 0-4-1-6 1-9z"/></svg>',
     redo: svg('<path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/>'),
   };
-  const ART = {
-    mix: c => `<svg viewBox="0 0 124 72" aria-hidden="true"><circle cx="24" cy="36" r="14" fill="#2563eb"/><rect x="48" y="22" width="28" height="28" rx="7" fill="#db2777"/><path d="M90 50 L104 22 L118 50 Z" fill="#ca8a04"/><path d="M6 64 C 40 58, 80 70, 118 60" fill="none" stroke="${c}" stroke-width="3" stroke-linecap="round"/></svg>`,
-    veelterm: c => `<svg viewBox="0 0 124 72" aria-hidden="true"><path d="M6 62 C 30 -10, 50 82, 70 32 S 102 2, 118 22" fill="none" stroke="${c}" stroke-width="4" stroke-linecap="round"/><circle cx="38" cy="36" r="6" fill="#fff" stroke="${c}" stroke-width="3"/><circle cx="84" cy="21" r="6" fill="#fff" stroke="${c}" stroke-width="3"/></svg>`,
-    expo: c => `<svg viewBox="0 0 124 72" aria-hidden="true"><path d="M6 66 C 54 64, 84 50, 118 4" fill="none" stroke="${c}" stroke-width="4" stroke-linecap="round"/><text x="14" y="30" font-family="Fredoka, sans-serif" font-size="26" font-weight="700" fill="${c}">2ˣ</text></svg>`,
-    wortel: c => `<svg viewBox="0 0 124 72" aria-hidden="true"><path d="M10 40 L 22 40 L 32 62 L 48 8 L 114 8" fill="none" stroke="${c}" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><text x="64" y="48" font-family="Fredoka, sans-serif" font-size="26" font-weight="700" fill="${c}">x</text></svg>`,
-    afgeleide: c => `<svg viewBox="0 0 124 72" aria-hidden="true"><path d="M6 62 C 42 62, 62 12, 118 8" fill="none" stroke="${c}" stroke-width="4" stroke-linecap="round"/><path d="M30 64 L 98 14" stroke="#e08600" stroke-width="3" stroke-linecap="round" stroke-dasharray="6 6"/><circle cx="64" cy="39" r="6" fill="${c}"/></svg>`,
-    formules: c => `<svg viewBox="0 0 124 72" aria-hidden="true"><text x="6" y="46" font-family="Fredoka, sans-serif" font-size="28" font-weight="700" fill="${c}">log R</text><path d="M88 37 h 24 m -9 -9 l 9 9 l -9 9" fill="none" stroke="${c}" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
-    lijnen: c => `<svg viewBox="0 0 124 72" aria-hidden="true"><path d="M6 62 L 118 10" stroke="${c}" stroke-width="4" stroke-linecap="round"/><path d="M6 20 L 118 56" stroke="#e08600" stroke-width="3.5" stroke-linecap="round" stroke-dasharray="7 6"/><circle cx="70" cy="33" r="6" fill="#fff" stroke="${c}" stroke-width="3"/></svg>`,
-    rijen: c => `<svg viewBox="0 0 124 72" aria-hidden="true"><rect x="8" y="46" width="16" height="20" rx="4" fill="${c}"/><rect x="31" y="36" width="16" height="30" rx="4" fill="${c}"/><rect x="54" y="26" width="16" height="40" rx="4" fill="${c}"/><rect x="77" y="16" width="16" height="50" rx="4" fill="${c}"/><rect x="100" y="6" width="16" height="60" rx="4" fill="${c}" opacity=".4"/></svg>`,
-  };
   const MIX = { id: 'mix', title: 'Alles door elkaar', blurb: 'Een mix, net als op het tentamen', color: C.color || '#1f9d55', soft: '#e8f8ef', art: 'mix' };
-  const artFor = t => ART[t.art] ? ART[t.art](t.color) : `<span class="sym" style="color:${t.color}">${t.sym || '?'}</span>`;
+  const artFor = t => { const f = ILLUSTRATIE[t.art] || ILLUSTRATIE[t.id]; return f ? f(t.color) : `<span class="sym" style="color:${t.color}">${t.sym || '?'}</span>`; };
   const EA = typeof EXAMENANALYSE !== 'undefined' ? EXAMENANALYSE : null;
   const VK = typeof VAK !== 'undefined' ? VAK : null;
   const examInfo = id => EA && EA.vaardigheden[id] ? EA.vaardigheden[id] : null;
@@ -143,7 +133,7 @@
     if (!V.stats.n) return `<div class="card resume" style="--i:1">
         <span class="eyebrow">Nieuw hier? Zo werkt het</span>
         <ol class="steps3"><li><i>1</i>Kies ${C.bank.length ? 'een onderwerp' : 'een vaardigheid'}</li><li><i>2</i>Los de som op in kleine stappen</li><li><i>3</i>Schrijf de uitwerking over, net als op je tentamen</li></ol>
-        <button class="btn primary big" data-topic="${C.topics[0].id}">${C.bank.length ? `Begin met ${C.topics[0].short.toLowerCase()}` : 'Begin met de belangrijkste'} ${ICON.arrow}</button></div>`;
+        <button class="btn primary big" data-topic="${C.topics[0].id}">${C.bank.length ? 'Begin met oefenen' : 'Begin met de belangrijkste'} ${ICON.arrow}</button></div>`;
     const t = nextTopic();
     if (!t) return `<div class="card resume" style="--i:1"><span class="eyebrow">Alles onder de knie</span><b style="font-size:18px">Klaar voor het echte werk?</b><span style="color:var(--muted);font-weight:700">Maak een heel voorbeeldtentamen, helemaal zelf.</span><button class="btn primary big" id="b-toexams">Tentamen maken ${ICON.arrow}</button></div>`;
     const pr = V.topic(t.id), stt = Voortgang.status(pr);
@@ -633,12 +623,18 @@
     const pad = Math.max(2, (hi - lo) * 0.4);
     let x0 = lo - pad, x1 = hi + pad;
     if (x1 - x0 < 6) { const c = (x0 + x1) / 2; x0 = c - 3; x1 = c + 3; }
+    // buiten het domein (bijvoorbeeld negatieve tijd) tekenen we niets
+    const dom = spec.domain || [-Infinity, Infinity];
+    if (x0 < dom[0]) { x1 += Math.min(dom[0] - x0, pad); x0 = dom[0] - (x1 - dom[0]) * 0.03; }
+    if (x1 > dom[1]) x1 = dom[1] + (dom[1] - x0) * 0.03;
+    spec = { ...spec, curves: spec.curves.map(c => ({ ...c, f: x => (x < dom[0] - 1e-9 || x > dom[1] + 1e-9 ? NaN : c.f(x)) })) };
     if (spec.curves.some(c => !isFinite(c.f(x0)))) { const ok = []; for (let i = 0; i <= 200; i++) { const x = x0 + (x1 - x0) * i / 200; if (isFinite(spec.curves[0].f(x))) ok.push(x); } if (ok.length) x0 = Math.max(x0, ok[0] - (x1 - x0) * 0.08); }
     const ys = [];
     const wx0 = Math.max(x0, lo - 1.5), wx1 = Math.min(x1, hi + 1.5);
     spec.curves.forEach(c => { for (let i = 0; i <= 240; i++) { const y = c.f(wx0 + (wx1 - wx0) * i / 240); if (isFinite(y)) ys.push(y); } });
     ys.sort((a, b) => a - b);
-    const mys = spec.marks.map(m => m.y).concat(spec.given ? [spec.given.y] : []).filter(isFinite);
+    // ook de functiewaarden in de belangrijke punten moeten in beeld zijn (bijvoorbeeld de beginwaarde)
+    const mys = spec.marks.map(m => m.y).concat(spec.given ? [spec.given.y] : [], spec.keys.map(k => spec.curves[0].f(k))).filter(isFinite);
     let y0 = Math.min(ys[Math.floor(ys.length * 0.06)] ?? 0, ...mys), y1 = Math.max(ys[Math.floor(ys.length * 0.94)] ?? 1, ...mys);
     const sp = y1 - y0 || 2;
     if (y0 > 0 && y0 < sp * 0.6) y0 = 0; if (y1 < 0 && -y1 < sp * 0.6) y1 = 0;
@@ -665,7 +661,7 @@
       for (let i = 0; i <= 120; i++) { const x = a0 + (a1 - a0) * i / 120; d += ` L${sx(x).toFixed(1)} ${sy(f0(x)).toFixed(1)}`; }
       shade = `<path class="shade" d="${d} L${sx(a1).toFixed(1)} ${sy(0).toFixed(1)} Z"/>`;
     }
-    const curves = shade + spec.curves.map((c, i) => `<path class="c${i ? 2 : 1} ${animate ? (i ? 'fade' : 'draw') : ''}" ${i ? '' : 'pathLength="1"'} d="${path(c.f)}"/>`).join('');
+    const curves = shade + spec.curves.map((c, i) => `<path class="c${i ? 2 : 1} ${animate ? (i ? 'fade' : 'draw') : ''}" d="${path(c.f)}"/>`).join('');
     let marks = '';
     if (spec.given && !done) marks += `<circle class="pt" cx="${sx(spec.given.x)}" cy="${sy(spec.given.y)}" r="5.5"/>`;
     if (done) spec.marks.forEach((m, i) => {

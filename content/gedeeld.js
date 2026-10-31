@@ -170,6 +170,8 @@ function maakOnderdeel({ onderdeel, gens, home }) {
       const prm = params || G.rand(lvlOf(lvl));
       const p = G.build(JSON.parse(JSON.stringify(prm)));
       p.params = prm; p.key = key; p.src = src || null; p.topic = G.topic;
+      // contextopgaven: tijd, aantallen en hoeveelheden zijn niet negatief, dus de grafiek begint bij 0
+      if (p.plot && !p.plot.domain) p.plot.domain = [0, Infinity];
       return p;
     },
     checkAns,

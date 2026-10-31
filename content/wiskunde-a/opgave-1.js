@@ -1322,13 +1322,13 @@ function plotSpec(p) {
 
 /* ---------- onderwerpen zoals de leerling ze ziet ---------- */
 const TOPICS = [
-  { id: 'veelterm', title: 'Veeltermen en snijpunten', short: 'Veeltermen', blurb: 'Buiten haakjes halen en de abc-formule', color: '#2563eb', soft: '#e6f0ff', art: 'veelterm' },
-  { id: 'expo', title: 'Exponentieel en log', short: 'Exponentieel', blurb: 'x in de exponent of in een log', color: '#7c3aed', soft: '#efe7ff', art: 'expo' },
-  { id: 'wortel', title: 'Wortelvergelijkingen', short: 'Wortels', blurb: 'Kwadrateren en daarna controleren', color: '#0d9488', soft: '#e0f7f5', art: 'wortel' },
-  { id: 'afgeleide', title: 'Afgeleide', short: 'Afgeleide', blurb: 'Helling, raaklijn, top of minimum', color: '#db2777', soft: '#ffe8f1', art: 'afgeleide' },
-  { id: 'formules', title: 'Formules omwerken', short: 'Formules', blurb: 'Van log(R) = … naar R = …', color: '#ea580c', soft: '#fff0e5', art: 'formules' },
-  { id: 'lijnen', title: 'Rechte lijnen', short: 'Lijnen', blurb: 'Richtingscoëfficiënt en snijpunten', color: '#0891b2', soft: '#e0f4f9', art: 'lijnen' },
-  { id: 'rijen', title: 'Rijen', short: 'Rijen', blurb: 'Rekenkundig, meetkundig en somformules', color: '#ca8a04', soft: '#fdf6dc', art: 'rijen' },
+  { id: 'veelterm', title: 'Tweede- en hogeregraads\u00ADvergelijkingen', short: 'Hogeregraadsvergelijkingen', blurb: 'Buiten haakjes halen en de abc-formule', color: '#2563eb', soft: '#e6f0ff', art: 'veelterm' },
+  { id: 'expo', title: 'Exponentiële en logaritmische vergelijkingen', short: 'Exponentiële vergelijkingen', blurb: 'x in de exponent of in een log', color: '#7c3aed', soft: '#efe7ff', art: 'expo' },
+  { id: 'wortel', title: 'Wortelvergelijkingen', short: 'Wortelvergelijkingen', blurb: 'Kwadrateren en daarna controleren', color: '#0d9488', soft: '#e0f7f5', art: 'wortel' },
+  { id: 'afgeleide', title: 'Differentiëren', short: 'Differentiëren', blurb: 'Helling, raaklijn, top of minimum', color: '#db2777', soft: '#ffe8f1', art: 'afgeleide' },
+  { id: 'formules', title: 'Formules herleiden met logaritmen', short: 'Formules herleiden', blurb: 'Van log(R) = … naar R = …', color: '#ea580c', soft: '#fff0e5', art: 'formules' },
+  { id: 'lijnen', title: 'Lineaire functies', short: 'Lineaire functies', blurb: 'Richtingscoëfficiënt en snijpunten', color: '#0891b2', soft: '#e0f4f9', art: 'lijnen' },
+  { id: 'rijen', title: 'Rekenkundige en meetkundige rijen', short: 'Rijen', blurb: 'Rekenkundig, meetkundig en somformules', color: '#ca8a04', soft: '#fdf6dc', art: 'rijen' },
 ];
 
 /* ---------- wat de app van deze cursus gebruikt ---------- */

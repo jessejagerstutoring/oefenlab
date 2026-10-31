@@ -30,9 +30,12 @@
     const voorbeelden = n ? n.voorbeelden : [{ vraag: v.voorbeeld.vraag, regels: null, tekst: v.voorbeeld.regels }];
     $('ns-article').innerHTML = `
       <header class="ns-head" style="--c:${o.kleur};--s:${o.zacht}">
-        <span class="eyebrow" style="color:${o.kleur}">${o.titel}</span>
-        <h1>${v.titel}</h1>
-        <p class="lead">${v.hover}</p>
+        <div class="ns-head-t">
+          <span class="eyebrow" style="color:${o.kleur}">${o.titel}</span>
+          <h1>${v.titel}</h1>
+          <p class="lead">${v.hover}</p>
+        </div>
+        ${ILLUSTRATIE[id] ? `<span class="ns-art">${ILLUSTRATIE[id](o.kleur)}</span>` : ''}
       </header>
       <section><h2>Het idee</h2>${n ? n.idee : `<p>${v.kort}</p><p>${v.herken}</p>`}</section>
       <section><h2>Zo pak je het aan</h2><ol class="ns-steps">${(n ? n.stappen : v.stappen).map(s => `<li>${s}</li>`).join('')}</ol></section>

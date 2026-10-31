@@ -188,7 +188,7 @@ h1, h2, h3 { font-family: var(--display); font-weight: 600; letter-spacing: -0.0
 .art svg * { vector-effect: non-scaling-stroke; }
 .card:hover .art svg { animation: wobble .6s var(--ease); }
 @keyframes wobble { 35% { transform: rotate(-4deg) scale(1.05); } 70% { transform: rotate(2deg); } }
-.topic b { font-size: 17px; font-weight: 800; line-height: 1.25; hyphens: auto; overflow-wrap: anywhere; }
+.topic b { font-size: 17px; font-weight: 800; line-height: 1.25; hyphens: manual; overflow-wrap: break-word; text-wrap: balance; }
 .topic .meta { display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 800; color: var(--muted); }
 .topic .meta .bar { flex: 1; height: 8px; }
 .topic .done-tag { color: var(--green-d); }
@@ -302,14 +302,14 @@ h1, h2, h3 { font-family: var(--display); font-weight: 600; letter-spacing: -0.0
 .plot text { fill: var(--muted); font: 600 11px var(--body); font-variant-numeric: tabular-nums; }
 .plot .c1 { fill: none; stroke: #2563eb; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
 .plot .c2 { fill: none; stroke: var(--amber); stroke-width: 2.6; stroke-dasharray: 7 6; stroke-linecap: round; }
-.plot .draw { stroke-dasharray: 1; stroke-dashoffset: 1; animation: draw 1.1s var(--ease) .1s forwards; }
-.plot .c2.fade { opacity: 0; animation: fadein .8s var(--ease) .5s forwards; }
-@keyframes draw { to { stroke-dashoffset: 0; } }
-@keyframes fadein { to { opacity: 1; } }
-.plot .tan { stroke: var(--green); stroke-width: 2.4; stroke-linecap: round; opacity: 0; animation: fadein .5s var(--ease) forwards; }
+/* de grafiek is altijd zichtbaar; de animatie is alleen een zachte entree (zonder pathLength-truc, die Safari niet goed tekent) */
+.plot .draw { animation: plotin .7s var(--ease) both; }
+.plot .c2.fade { animation: plotin .7s var(--ease) .3s both; }
+@keyframes plotin { from { opacity: 0; } }
+.plot .tan { stroke: var(--green); stroke-width: 2.4; stroke-linecap: round; animation: plotin .5s var(--ease) both; }
 .plot .pt { fill: var(--bg); stroke: var(--ink); stroke-width: 2.4; }
 .plot .pt.res { fill: var(--green); stroke: var(--bg); stroke-width: 3; transform-box: fill-box; transform-origin: center; animation: pop .45s var(--spring) backwards; }
-.plot .ptlab { fill: var(--ink); font-weight: 800; font-size: 12px; opacity: 0; animation: fadein .4s var(--ease) .2s forwards; }
+.plot .ptlab { fill: var(--ink); font-weight: 800; font-size: 12px; animation: plotin .4s var(--ease) .2s both; }
 .legend { display: flex; gap: 6px 18px; flex-wrap: wrap; font-size: 14px; color: var(--ink-2); }
 .legend span { display: inline-flex; align-items: center; gap: 8px; }
 .legend i { width: 22px; height: 0; border-top: 3px solid #2563eb; }
@@ -693,6 +693,10 @@ dialog::backdrop { background: rgba(20, 22, 40, .35); }
 /* hover-kaartje: één korte zin, daaronder rustig de telling */
 .reveal { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 12px; font-size: 16px; line-height: 1.35; font-weight: 800; }
 .reveal > span { text-wrap: balance; }
+/* bij onderwerpkaarten blijft het plaatje zichtbaar: de tekst schuift alleen over titel en status */
+.topic .reveal { top: 126px; bottom: 10px; justify-content: center; gap: 6px; padding: 10px 14px; font-size: 15px; line-height: 1.3; }
+.topic .reveal small { padding-top: 6px; font-size: 12px; }
+.reveal-card:hover .art { transform: none; }
 .reveal small { margin: 0; padding-top: 8px; border-top: 1px solid rgba(255, 255, 255, .28); font-size: 12.5px; font-weight: 700; opacity: .85; }
 
 /* =====================================================================
@@ -710,7 +714,11 @@ dialog::backdrop { background: rgba(20, 22, 40, .35); }
 .ns-nav small { font-size: 11px; font-weight: 800; opacity: .6; text-transform: uppercase; letter-spacing: .05em; }
 .ns-select { display: none; width: 100%; min-height: 48px; font-size: 16px; font-weight: 700; padding: 0 12px; border-radius: 14px; border: 2px solid var(--line-2); background: var(--bg); }
 .ns-article { min-width: 0; max-width: 720px; display: flex; flex-direction: column; gap: var(--space-xl); animation: rise .4s var(--ease); }
-.ns-head { display: flex; flex-direction: column; gap: 10px; padding: var(--space-lg); border-radius: 24px; background: var(--s); }
+.ns-head { display: flex; align-items: center; gap: var(--space-lg); padding: var(--space-lg); border-radius: 24px; background: var(--s); }
+.ns-head-t { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 10px; }
+.ns-art { flex: none; width: 186px; height: 108px; padding: 10px; border-radius: 18px; background: rgba(255, 255, 255, .7); }
+.ns-art svg { width: 100%; height: 100%; overflow: visible; }
+@media (max-width: 640px) { .ns-art { display: none; } }
 .ns-head h1 { font-size: clamp(2rem, 4.4vw, 2.8rem); font-weight: 700; }
 .ns-head .lead { margin: 0; font-size: 19px; font-weight: 700; color: var(--ink); }
 .ns-article section { display: flex; flex-direction: column; gap: var(--space-sm); }

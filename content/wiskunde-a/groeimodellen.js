@@ -1,5 +1,5 @@
 /*
- * Wiskunde A · Groeimodellen
+ * Wiskunde A · Lineaire en exponentiële groei
  * Generators per vaardigheid. Elke som is opgebouwd zoals het tentamen het vraagt:
  * een korte context, een formule of gegevens, en een vraag die je algebraïsch oplost.
  * verify() rekent het antwoord op een andere manier na; de test gebruikt dat.
@@ -249,7 +249,7 @@ function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
 
 const COURSE = maakOnderdeel({
   onderdeel: 'groei',
-  home: { titel: 'Groeimodellen', tekst: 'Begin met wat het vaakst gevraagd wordt.' },
+  home: { titel: 'Lineaire en exponentiële groei', tekst: 'Begin met wat het vaakst gevraagd wordt.' },
   gens: {
     gTijdstip: { topic: 'groei-tijdstip', rand: randTijdstip, build: buildTijdstip, w: 3 },
     gFactor: { topic: 'groei-factor', rand: randGFactor, build: buildGFactor, w: 2 },

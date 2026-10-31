@@ -1,5 +1,5 @@
 /*
- * Wiskunde A · Afgeleide en optimaliseren
+ * Wiskunde A · Differentiëren en optimaliseren
  * Het tentamen gebruikt drie soorten modellen: winst = opbrengst − kosten (kwadratisch),
  * een breuk (aantal bezoekers, besmettingen) en een product met een e-macht. Alle drie komen
  * hier terug, in dezelfde vraagvormen: formule opstellen, maximum, wanneer meer dan, stijgen/dalen.
@@ -270,7 +270,7 @@ function buildMeetkunde({ L, Z, h, D }) {
 
 const COURSE = maakOnderdeel({
   onderdeel: 'opt',
-  home: { titel: 'Afgeleide en optimaliseren', tekst: 'Begin met wat het vaakst gevraagd wordt.' },
+  home: { titel: 'Differentiëren en optimaliseren', tekst: 'Begin met wat het vaakst gevraagd wordt.' },
   gens: {
     oExtreem: { topic: 'opt-extreem', rand: randExtreem, build: buildExtreem, w: 3 },
     oVergelijking: { topic: 'opt-vergelijking', rand: randVergelijking, build: buildVergelijking, w: 2 },

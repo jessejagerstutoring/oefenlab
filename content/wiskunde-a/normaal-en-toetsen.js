@@ -1,5 +1,5 @@
 /*
- * Wiskunde A · Normale verdeling en toetsen
+ * Wiskunde A · Normale verdeling en hypothesetoetsen
  * Op het tentamen werk je zonder grafische rekenmachine. Daarom komen kansen uit de
  * vuistregels (68% en 95%) of uit een gegeven figuur, en grenzen uit de formulelijst.
  */
@@ -229,7 +229,7 @@ function buildConclusie({ c, m, sd, n, a, x }) {
 
 const COURSE = maakOnderdeel({
   onderdeel: 'normaal',
-  home: { titel: 'Normale verdeling en toetsen', tekst: 'Begin met wat het vaakst gevraagd wordt.' },
+  home: { titel: 'Normale verdeling en hypothesetoetsen', tekst: 'Begin met wat het vaakst gevraagd wordt.' },
   gens: {
     tConclusie: { topic: 'toets-conclusie', rand: randConclusie, build: buildConclusie, w: 2.5 },
     tHyp: { topic: 'toets-hyp', rand: randHyp, build: buildHyp, w: 1.5 },
