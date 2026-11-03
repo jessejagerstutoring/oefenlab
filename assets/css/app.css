@@ -761,3 +761,36 @@ dialog::backdrop { background: rgba(20, 22, 40, .35); }
   .topic-learn { top: 50%; right: 12px; transform: translateY(-50%); margin: 0; }
   .topic-learn:hover { transform: translateY(-50%) scale(1.08); }
 }
+
+/* =====================================================================
+   Tentamenopgaven: één verhaal met figuur, en deelvragen a, b, c, …
+   ===================================================================== */
+.opgaven { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr)); gap: var(--space-md); }
+.opgave { position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: 6px; padding: 18px 52px 18px 18px; text-align: left; }
+.opgave b { font-family: var(--display); font-weight: 600; font-size: 20px; line-height: 1.25; }
+.opgave > span:not(.eyebrow) { font-size: 14px; font-weight: 700; color: var(--muted); }
+.opgave > svg { position: absolute; right: 18px; top: 50%; width: 22px; height: 22px; transform: translateY(-50%); color: var(--ink-2); }
+
+/* het verhaal boven de vraag; in te klappen zodat de vraag dichtbij blijft */
+.ctx { border: 2px solid var(--line); border-radius: 20px; background: var(--soft); overflow: hidden; }
+.ctx summary { list-style: none; cursor: pointer; display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; padding: 14px 18px; }
+.ctx summary::-webkit-details-marker { display: none; }
+.ctx summary b { font-family: var(--display); font-weight: 600; font-size: 18px; }
+.ctx summary .eyebrow { flex-basis: 100%; }
+.ctx-toggle { margin-left: auto; font-size: 13px; font-weight: 800; color: var(--ink-2); text-decoration: underline; text-underline-offset: 3px; }
+.ctx-body { display: flex; flex-direction: column; gap: 12px; padding: 0 18px 18px; font-size: 16.5px; line-height: 1.65; color: var(--ink); }
+.ctx-body p { margin: 0; }
+.ctx-info { padding-top: 12px; border-top: 1px dashed var(--line-2); display: flex; flex-direction: column; gap: 12px; }
+
+/* figuren zoals op het tentamen */
+.fig { margin: 0; display: flex; flex-direction: column; gap: 8px; padding: 12px; border-radius: 16px; background: var(--bg); border: 1px solid var(--line); max-width: 560px; }
+.fig > svg { width: 100%; height: auto; display: block; }
+.fig figcaption { font-size: 14px; line-height: 1.5; color: var(--ink-2); font-weight: 600; }
+.stepcard .fig { margin: 4px 0 14px; }
+.fig-rooster { max-width: 280px; }
+.fig-tabel .tw { overflow-x: auto; }
+.fig-tabel table { border-collapse: collapse; font-size: 15px; min-width: 100%; }
+.fig-tabel th, .fig-tabel td { border: 1px solid var(--line-2); padding: 8px 12px; text-align: center; white-space: nowrap; }
+.fig-tabel thead th, .fig-tabel tbody th { background: var(--soft); font-weight: 800; }
+.fig-tabel tbody th { text-align: left; }
+.fig-tabel .leeg { color: var(--muted); font-weight: 800; }

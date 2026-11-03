@@ -12,7 +12,16 @@
   const $ = id => document.getElementById(id);
   const GOAL = 5; // zoveel sommen zonder hulp en een onderwerp telt als "onder de knie"
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const topicOf = id => C.topics.find(t => t.id === id) || null;
+  // een deelvraag van een tentamenopgave kan een vaardigheid uit een ander onderdeel oefenen
+  const topicOf = id => C.topics.find(t => t.id === id) || skillTopic(id);
+  function skillTopic(id) {
+    const v = typeof VAK !== 'undefined' && VAK.vaardigheden[id];
+    if (!v) return null;
+    const o = VAK.onderdelen.find(x => x.id === v.onderdeel);
+    return { id, title: v.titel, short: v.titel, color: o.kleur, soft: o.zacht };
+  }
+  const OPG = C.opgaven || {};
+  const figHtml = spec => !spec ? '' : spec.soort === 'plot' ? `<figure class="fig">${drawPlot(spec, false, false)}${spec.onderschrift ? `<figcaption>${spec.onderschrift}</figcaption>` : ''}</figure>` : typeof FIGUUR === 'undefined' ? '' : FIGUUR(spec);
   const pickOne = a => a[Math.floor(Math.random() * a.length)];
   const replay = (el, cls) => { el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); };
   const LEVELS = [['1', 'Basis'], ['2', 'Tentamen'], ['3', 'Pittig']];
@@ -149,6 +158,11 @@
         <div class="hero-t"><h1>${C.home ? C.home.titel : 'Opgave 1: algebra'}</h1><p>${C.home ? C.home.tekst : 'Elke som los je op in kleine stappen.'}</p></div>
         ${heroCard()}
       </section>
+      ${Object.keys(OPG).length ? `<section>
+        <div class="section-h"><h2>Tentamenopgaven</h2></div>
+        <p class="note" style="margin:0 0 16px">Een hele opgave zoals op het tentamen: één verhaal, met vragen die op elkaar voortbouwen.</p>
+        <div class="opgaven">${Object.entries(OPG).map(([k, O], i) => `<button type="button" class="card opgave" data-opg="${k}" style="--i:${i}"><span class="eyebrow">${O.soort}</span><b>${O.titel}</b><span>${O.vragen} vragen · ${O.punten} punten</span>${ICON.arrow}</button>`).join('')}</div>
+      </section>` : ''}
       <section>
         <div class="section-h"><h2>${C.bank.length ? 'Onderwerpen' : 'Vaardigheden'}</h2>
           <div class="settings"><span class="setting"><span class="lab">Werkwijze</span>${seg(MODES, st.mode, 'mode')}</span><span class="setting"><span class="lab">Niveau</span>${seg(LEVELS, st.level, 'level')}</span></div>
@@ -161,6 +175,7 @@
       </section>`;
     el.querySelectorAll('[data-topic]').forEach(b => b.onclick = () => startPractice({ source: 'new', topic: b.dataset.topic }));
     el.querySelectorAll('[data-learn]').forEach(b => b.onclick = () => openLearn(b.dataset.learn));
+    el.querySelectorAll('[data-opg]').forEach(b => b.onclick = () => startPractice({ source: 'opg', opg: b.dataset.opg }));
     el.querySelectorAll('[data-mode]').forEach(b => b.onclick = () => { st.mode = b.dataset.mode; V.setPrefs({ mode: st.mode }); renderHome(); });
     el.querySelectorAll('[data-level]').forEach(b => b.onclick = () => { st.level = b.dataset.level; V.setPrefs({ level: st.level }); renderHome(); });
     $('b-exams').onclick = () => setView('exams');
@@ -224,7 +239,7 @@
   function startPractice(o) {
     st.source = o.source; st.topic = o.topic || 'mix'; st.lastKey = null; st.lastBank = -1;
     setView('practice');
-    if (o.source === 'exam') startExam(o.examN); else newProblem();
+    if (o.source === 'exam') startExam(o.examN); else if (o.source === 'opg') startOpgave(o.opg); else newProblem();
   }
   function resume() {
     try { resumeFrom(V.resume); } catch (e) { V.setResume(null); newProblem(); }
@@ -232,7 +247,8 @@
   function resumeFrom(r) {
     Object.assign(st, { source: r.source, topic: r.topic, level: r.level, mode: r.mode });
     setView('practice');
-    if (r.exam) st.exam = { n: r.exam.n, items: examItems(r.exam.n), idx: r.exam.idx, res: r.exam.res };
+    if (r.exam && r.exam.opg) { const b = C.maakOpgave(r.exam.opg, r.exam.params); st.exam = { opg: r.exam.opg, params: b.params, built: b, items: b.delen.map(d => ({ pt: d.pt })), idx: r.exam.idx, res: r.exam.res }; }
+    else if (r.exam) st.exam = { n: r.exam.n, items: examItems(r.exam.n), idx: r.exam.idx, res: r.exam.res };
     else st.exam = null;
     if (!r.key && st.exam && st.exam.res[st.exam.idx]) return nextPart(); // deze deelvraag was al af
     if (!r.key) return st.exam ? loadPart() : newProblem();
@@ -249,7 +265,7 @@
     V.setResume({
       source: st.source, topic: st.topic, level: st.level, mode: st.mode,
       key: st.finished ? null : p.key, params: st.finished ? null : p.params, src: p.src, si: st.si, helped: [...st.helped],
-      exam: st.exam ? { n: st.exam.n, idx: st.exam.idx, res: st.exam.res } : null,
+      exam: st.exam ? { n: st.exam.n, opg: st.exam.opg, params: st.exam.params, idx: st.exam.idx, res: st.exam.res } : null,
     });
   }
   function newProblem() {
@@ -284,9 +300,16 @@
   const examItems = n => C.bank.filter(b => b.ex === n).sort((a, b) => a.pt.localeCompare(b.pt));
   function startExam(n) { st.exam = { n, items: examItems(n), idx: 0, res: [] }; loadPart(); }
   function loadPart() {
-    const it = st.exam.items[st.exam.idx];
-    st.prob = C.makeProblem(it.g, JSON.parse(JSON.stringify(it.p)), it.src);
+    if (st.exam.opg) st.prob = C.maakOpgave(st.exam.opg, st.exam.params).delen[st.exam.idx];
+    else { const it = st.exam.items[st.exam.idx]; st.prob = C.makeProblem(it.g, JSON.parse(JSON.stringify(it.p)), it.src); }
     resetProblem();
+  }
+  // een tentamenopgave: één verhaal met deelvragen a, b, c, …; de getallen zijn elke keer anders
+  function startOpgave(key, params) {
+    const b = C.maakOpgave(key, params || null, +st.level);
+    st.exam = { opg: key, params: b.params, built: b, items: b.delen.map(d => ({ pt: d.pt })), idx: 0, res: [] };
+    st.ctxOpen = true;
+    loadPart();
   }
   function recordPart() {
     if (!st.exam || st.recorded) return;
@@ -300,23 +323,24 @@
     const el = $('exstrip');
     if (!st.exam) { el.hidden = true; return; }
     el.hidden = false;
-    el.innerHTML = `<span>Tentamen ${st.exam.n}</span><span class="pills">${st.exam.items.map((it, i) => {
+    el.innerHTML = `<span>${st.exam.opg ? st.exam.built.titel : `Tentamen ${st.exam.n}`}</span><span class="pills">${st.exam.items.map((it, i) => {
       const r = st.exam.res[i];
       const cls = r ? (r.earned === r.pts ? 'ok' : r.earned > 0 ? 'half' : 'no') : i === st.exam.idx ? 'cur' : '';
-      return `<span class="${cls}" title="Opgave 1${it.pt}">${it.pt}</span>`;
+      return `<span class="${cls}" title="${st.exam.opg ? 'Vraag ' : 'Opgave 1'}${it.pt}">${it.pt}</span>`;
     }).join('')}</span>`;
   }
   function nextPart() {
     if (st.exam.idx === st.exam.items.length - 1) return renderExamSummary();
     st.exam.idx++; loadPart();
   }
-  function partLabel() { const last = st.exam.idx === st.exam.items.length - 1; return last ? 'Bekijk je score' : `Naar opgave 1${st.exam.items[st.exam.idx + 1].pt}`; }
+  function partLabel() { const last = st.exam.idx === st.exam.items.length - 1; return last ? 'Bekijk je score' : `Naar ${st.exam.opg ? 'vraag ' : 'opgave 1'}${st.exam.items[st.exam.idx + 1].pt}`; }
   function renderExamSummary() {
     const ex = st.exam, tot = ex.res.reduce((s, r) => s + r.pts, 0), got = ex.res.reduce((s, r) => s + r.earned, 0);
-    const miss = C.missing[ex.n] || [];
-    V.examDone(ex.n, got, tot); V.setResume(null);
+    const miss = ex.opg ? [] : C.missing[ex.n] || [];
+    if (!ex.opg) V.examDone(ex.n, got, tot);
+    V.setResume(null);
     hideBar();
-    $('qpill').textContent = `Tentamen ${ex.n}`; $('pq').textContent = 'Je score'; $('tools').innerHTML = ''; $('panel').hidden = true;
+    $('qpill').textContent = ex.opg ? ex.built.titel : `Tentamen ${ex.n}`; renderContext(true); $('pq').textContent = 'Je score'; $('tools').innerHTML = ''; $('panel').hidden = true;
     $('h-bar').style.setProperty('--w', '100%');
     const w = $('work');
     w.className = 'stepcard done';
@@ -324,20 +348,21 @@
       <span class="badge${got >= tot * 0.6 ? '' : ' half'}">${ICON.check}</span>
       <div class="bigscore">${got} <small>van ${tot} punten</small></div>
       <h2>${got === tot ? 'Alles goed. Dit tentamen heb je onder de knie!' : got >= tot * 0.6 ? 'Mooi resultaat. Je bent goed op weg.' : 'Goed dat je het geoefend hebt.'}</h2>
-      <table class="score">${ex.res.map(r => `<tr><td>Opgave 1${r.pt}</td><td>${r.earned} / ${r.pts}</td></tr>`).join('')}<tr><td>Totaal</td><td>${got} / ${tot}</td></tr></table>
+      <table class="score">${ex.res.map(r => `<tr><td>${ex.opg ? 'Vraag ' : 'Opgave 1'}${r.pt}</td><td>${r.earned} / ${r.pts}</td></tr>`).join('')}<tr><td>Totaal</td><td>${got} / ${tot}</td></tr></table>
       ${miss.length ? `<p class="note">Opgave 1${miss.join(' en 1')} van dit tentamen zit${miss.length > 1 ? 'ten' : ''} nog niet in de trainer. Die kun je op papier oefenen.</p>` : ''}
       <p class="note">${st.mode === 'step' ? 'Bij stap voor stap tellen alleen de stappen die je zonder hulp deed.' : 'Bij een goed eindantwoord krijg je alle punten, net als bij een goede uitwerking.'}</p>
-      <div class="row"><button class="btn primary big" id="b-nextex">Volgend tentamen ${ICON.arrow}</button><button class="btn big" id="b-again">${ICON.redo}Opnieuw</button></div>`;
+      <div class="row"><button class="btn primary big" id="b-nextex">${ex.opg ? 'Volgende opgave' : 'Volgend tentamen'} ${ICON.arrow}</button><button class="btn big" id="b-again">${ICON.redo}${ex.opg ? 'Zelfde opgave, nieuwe getallen' : 'Opnieuw'}</button></div>`;
     if (got === tot) w.insertAdjacentHTML('afterbegin', confetti());
-    $('b-nextex').onclick = () => startExam(EXAMS[(EXAMS.indexOf(ex.n) + 1) % EXAMS.length]);
-    $('b-again').onclick = () => startExam(ex.n);
+    const keys = Object.keys(OPG);
+    $('b-nextex').onclick = () => (ex.opg ? startOpgave(keys[(keys.indexOf(ex.opg) + 1) % keys.length]) : startExam(EXAMS[(EXAMS.indexOf(ex.n) + 1) % EXAMS.length]));
+    $('b-again').onclick = () => (ex.opg ? startOpgave(ex.opg) : startExam(ex.n));
     $('b-nextex').focus({ preventScroll: true });
   }
 
   /* ---------- oefenscherm ---------- */
   function render() {
     const p = st.prob;
-    renderExamStrip(); renderMeta(); renderProgress();
+    renderExamStrip(); renderMeta(); renderProgress(); renderContext();
     const pq = $('pq');
     pq.innerHTML = p.prompt;
     pq.classList.toggle('long', p.prompt.replace(/\\\(.*?\\\)/g, 'xxxxxxxx').length > 90);
@@ -345,12 +370,25 @@
     renderSheet(); renderStats();
     st.mode === 'step' ? renderStep() : renderSelf();
   }
+  // bij een tentamenopgave staan het verhaal, de figuur en de extra informatie van eerdere vragen boven de vraag
+  function renderContext(hide) {
+    let el = $('ctx');
+    if (!el) { el = document.createElement('details'); el.id = 'ctx'; el.className = 'ctx'; $('qpill').before(el); el.addEventListener('toggle', () => { st.ctxOpen = el.open; }); }
+    const ex = st.exam;
+    if (hide || !ex || !ex.opg) { el.hidden = true; return; }
+    const b = ex.built, delen = b.delen.slice(0, ex.idx + 1);
+    el.hidden = false; el.open = st.ctxOpen !== false;
+    el.innerHTML = `<summary><span class="eyebrow">${b.soort}</span><b>${b.titel}</b><span class="ctx-toggle">${el.open ? 'Verberg' : 'Toon'} het verhaal</span></summary>
+      <div class="ctx-body">${b.intro}${figHtml(b.figuur)}${delen.map(d => (d.info ? `<div class="ctx-info">${d.info}${figHtml(d.infoFig)}</div>` : '')).join('')}</div>`;
+    el.querySelector('summary').onclick = () => setTimeout(() => { el.querySelector('.ctx-toggle').textContent = `${el.open ? 'Verberg' : 'Toon'} het verhaal`; });
+    typeset(el);
+  }
   function renderMeta() {
     const p = st.prob, t = topicOf(p.topic);
     const hideType = st.mode === 'step' && st.si === 0 && !st.finished && p.steps[0].label === 'Herkennen' && (st.topic === 'mix' || st.source !== 'new');
     const pill = $('qpill');
     pill.style.setProperty('--s', hideType ? '#eef0f5' : t.soft); pill.style.setProperty('--c', hideType ? 'var(--ink-2)' : t.color);
-    const where = st.exam ? `Opgave 1${st.exam.items[st.exam.idx].pt}` : p.src || ({ 1: 'Oefensom, basis', 2: 'Oefensom, tentamenniveau', 3: 'Oefensom, pittig' })[st.level];
+    const where = st.exam ? `${st.exam.opg ? 'Vraag ' : 'Opgave 1'}${st.exam.items[st.exam.idx].pt}` : p.src || ({ 1: 'Oefensom, basis', 2: 'Oefensom, tentamenniveau', 3: 'Oefensom, pittig' })[st.level];
     pill.textContent = `${hideType ? 'Wat voor som is dit?' : t.title} · ${p.pts} punten · ${where}`;
   }
   function renderProgress() {
@@ -431,6 +469,7 @@
     w.innerHTML = `
       <div class="stephead"><span class="eyebrow">Stap ${st.si + 1} · ${s.label}</span></div>
       <p class="ask">${s.q}</p>
+      ${figHtml(s.fig)}
       <div id="act"></div>`;
     const act = $('act');
     if (s.kind === 'mc') {

@@ -155,7 +155,32 @@ function zonderTexKomma(o, k) {
   if (Object.prototype.toString.call(o) === '[object Object]') { for (const key of Object.keys(o)) o[key] = zonderTexKomma(o[key], key); }
   return o;
 }
-function maakOnderdeel({ onderdeel, gens, home }) {
+// laatste afwerking van een som of deelvraag: grafiek vanaf 0 en geen LaTeX-code in gewone tekst
+function afwerken(p) {
+  if (p.plot && !p.plot.domain) p.plot.domain = [0, Infinity];
+  ['prompt', 'steps', 'plot'].forEach(k => { if (p[k]) p[k] = zonderTexKomma(p[k], k); });
+  return p;
+}
+/* Een tentamenopgave: één verhaal (intro, figuur) met deelvragen a, b, c, …
+ * build(params) geeft { intro, figuur, delen: [{ pt, info?, infoFig?, topic, prompt, steps, final, pts, verify }] }. */
+function maakOpgaven(opgaven) {
+  const meta = {};
+  Object.entries(opgaven).forEach(([k, O]) => {
+    const b = O.build(O.rand(2));
+    meta[k] = { titel: O.titel, soort: O.soort, vragen: b.delen.length, punten: b.delen.reduce((s, d) => s + d.pts, 0) };
+  });
+  const maak = (key, params, lvl) => {
+    const O = opgaven[key], prm = params || O.rand(lvlOf(lvl));
+    const b = O.build(JSON.parse(JSON.stringify(prm)));
+    b.delen.forEach(d => { afwerken(d); d.params = null; d.src = null; if (d.info) d.info = zonderTexKomma(d.info, 'prompt'); });
+    return { ...b, params: prm, titel: O.titel, soort: O.soort, intro: zonderTexKomma(b.intro, 'prompt') };
+  };
+  return { meta, maak };
+}
+function maakOnderdeel({ onderdeel, gens, home, opgaven }) {
+  // tentamenopgaven voor dit onderdeel staan in content/<vak>/tentamenopgaven.js
+  if (!opgaven && typeof TENTAMENOPGAVEN !== 'undefined') opgaven = TENTAMENOPGAVEN[onderdeel] || null;
+  const opg = opgaven ? maakOpgaven(opgaven) : { meta: {}, maak: null };
   const o = VAK.onderdelen.find(x => x.id === onderdeel);
   const topics = Object.entries(VAK.vaardigheden).filter(([id, v]) => v.onderdeel === onderdeel && Object.values(gens).some(g => g.topic === id))
     .map(([id, v]) => ({ id, title: v.titel, short: v.titel, blurb: v.kort, color: o.kleur, soft: o.zacht, sym: o.symbool }));
@@ -178,11 +203,10 @@ function maakOnderdeel({ onderdeel, gens, home }) {
       const prm = params || G.rand(lvlOf(lvl));
       const p = G.build(JSON.parse(JSON.stringify(prm)));
       p.params = prm; p.key = key; p.src = src || null; p.topic = G.topic;
-      // contextopgaven: tijd, aantallen en hoeveelheden zijn niet negatief, dus de grafiek begint bij 0
-      if (p.plot && !p.plot.domain) p.plot.domain = [0, Infinity];
-      ['prompt', 'steps', 'plot'].forEach(k => { if (p[k]) p[k] = zonderTexKomma(p[k], k); });
-      return p;
+      return afwerken(p);
     },
+    opgaven: opg.meta,
+    maakOpgave: opg.maak,
     checkAns,
     ansText: ansDec,
     plotSpec: () => null,

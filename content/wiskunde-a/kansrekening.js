@@ -112,7 +112,7 @@ function buildDobbel({ vorm, s, m, d }) {
     type: 'kans', pts: 3, prompt: `Je gooit met ${n} gewone dobbelstenen. Bereken de kans dat ${vraag}.`,
     steps: [
       num('Totaal', `Hoeveel uitkomsten zijn er in totaal met ${n} dobbelstenen?`, [tot], { hint: `6 keer 6${n > 2 ? ' keer 6…' : ''}`, write: [`\\text{totaal} = 6^{${n}} = ${tot}`], th: ['kans-dobbel'] }),
-      num('Gunstig', 'Hoeveel daarvan zijn gunstig?', [gunst], { hint: uitleg, write: [`\\text{gunstig} = ${gunst}`] }),
+      num('Gunstig', 'Hoeveel daarvan zijn gunstig?', [gunst], { hint: uitleg, write: [`\\text{gunstig} = ${gunst}`], fig: n === 2 ? { soort: 'rooster', goed: () => false, onderschrift: 'Alle 36 uitkomsten, met in elk vakje de som van de ogen. Tel de vakjes die passen.' } : null }),
       num('Kans', 'Wat is de kans? (Breuk mag, of 4 decimalen.)', [ans], { dp: 4, write: [`P = \\dfrac{${gunst}}{${tot}} ${eqd(ans, 4)}`] }),
     ],
     final: [{ label: 'P', answers: [ans], dp: 4 }],
